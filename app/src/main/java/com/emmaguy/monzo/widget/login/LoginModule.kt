@@ -3,7 +3,7 @@ package com.emmaguy.monzo.widget.login
 import android.content.Context
 import com.emmaguy.monzo.widget.AppModule
 import com.emmaguy.monzo.widget.R
-import com.emmaguy.monzo.widget.StorageModule
+import com.emmaguy.monzo.widget.storage.StorageModule
 import com.emmaguy.monzo.widget.api.ApiModule
 
 class LoginModule(

@@ -1,10 +1,10 @@
 package com.emmaguy.monzo.widget.login
 
-import com.emmaguy.monzo.widget.UserStorage
 import com.emmaguy.monzo.widget.api.MonzoApi
 import com.emmaguy.monzo.widget.api.model.AccountType
 import com.emmaguy.monzo.widget.common.BasePresenter
 import com.emmaguy.monzo.widget.common.plus
+import com.emmaguy.monzo.widget.storage.UserStorage
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Scheduler
@@ -71,7 +71,6 @@ class LoginPresenter(
                 .doOnNext {
                     for (account in it) {
                         when {
-                            account.type == AccountType.PREPAID -> userStorage.prepaidAccountId = account.id
                             account.type == AccountType.CURRENT_ACCOUNT -> userStorage.currentAccountId = account.id
                         }
                     }

@@ -13,21 +13,10 @@
               android:gravity="center"
               android:text="@string/settings_title_choose_type"
               android:textSize="16sp"
-              app:layout_constraintBottom_toTopOf="@+id/prepaidButton"
               app:layout_constraintEnd_toEndOf="parent"
               app:layout_constraintStart_toStartOf="parent"
               app:layout_constraintTop_toTopOf="parent"
               app:layout_constraintVertical_chainStyle="packed"/>
-
-    <Button android:id="@+id/prepaidButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="@string/settings_title_prepaid_account"
-            app:layout_constraintBottom_toTopOf="@+id/currentAccountButton"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/settingsTitleTextView"/>
 
     <Button android:id="@+id/currentAccountButton"
             android:layout_width="wrap_content"
@@ -37,6 +26,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/prepaidButton"/>
+            app:layout_constraintTop_toBottomOf="@id/settingsTitleTextView"/>
 
 </android.support.constraint.ConstraintLayout>

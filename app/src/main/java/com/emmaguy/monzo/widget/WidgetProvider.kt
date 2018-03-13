@@ -13,7 +13,6 @@ import android.text.Spanned
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.ForegroundColorSpan
 import android.widget.RemoteViews
-import com.emmaguy.monzo.widget.api.model.AccountType
 import com.emmaguy.monzo.widget.common.TypefaceSpan
 import com.emmaguy.monzo.widget.common.toPx
 import com.emmaguy.monzo.widget.settings.SettingsActivity
@@ -22,7 +21,7 @@ import java.math.BigDecimal
 import java.util.*
 
 
-class BalanceWidgetProvider : AppWidgetProvider() {
+class WidgetProvider : AppWidgetProvider() {
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         updateAllWidgets(context)
     }
@@ -39,7 +38,7 @@ class BalanceWidgetProvider : AppWidgetProvider() {
         private const val ROBOTO_REGULAR = "sans-serif"
 
         fun updateAllWidgets(context: Context) {
-            val thisWidget = ComponentName(context, BalanceWidgetProvider::class.java)
+            val thisWidget = ComponentName(context, WidgetProvider::class.java)
             val appWidgetManager = AppWidgetManager.getInstance(context)
             val allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget)
 
@@ -50,9 +49,9 @@ class BalanceWidgetProvider : AppWidgetProvider() {
 
         fun updateWidget(context: Context, appWidgetId: Int) {
             val userStorage = MonzoWidgetApp.get(context).storageModule.userStorage
-            val isCurrentAccount = userStorage.accountType(appWidgetId) == AccountType.CURRENT_ACCOUNT
+            val isCurrentAccount = userStorage.widgetType(appWidgetId) == WidgetType.CURRENT_ACCOUNT
 
-            val accountBalance = if (isCurrentAccount) userStorage.currentAccountBalance else userStorage.prepaidBalance
+            val accountBalance = userStorage.currentAccountBalance
             if (accountBalance == null) {
                 Timber.d("No account balance for widgetId: $appWidgetId is current account: $isCurrentAccount")
                 return

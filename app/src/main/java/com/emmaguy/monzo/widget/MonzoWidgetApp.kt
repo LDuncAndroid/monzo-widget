@@ -5,6 +5,7 @@ import android.content.Context
 import com.emmaguy.monzo.widget.api.ApiModule
 import com.emmaguy.monzo.widget.login.LoginModule
 import com.emmaguy.monzo.widget.settings.SettingsModule
+import com.emmaguy.monzo.widget.storage.StorageModule
 import timber.log.Timber
 
 

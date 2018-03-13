@@ -5,7 +5,7 @@ import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import com.emmaguy.monzo.widget.BalanceWidgetProvider
+import com.emmaguy.monzo.widget.WidgetProvider
 import com.emmaguy.monzo.widget.MonzoWidgetApp
 import com.emmaguy.monzo.widget.R
 import com.jakewharton.rxbinding2.view.clicks
@@ -39,13 +39,9 @@ class SettingsActivity : AppCompatActivity(), SettingsPresenter.View {
         return currentAccountButton.clicks()
     }
 
-    override fun prepaidClicks(): Observable<Unit> {
-        return prepaidButton.clicks()
-    }
-
     override fun finish(appWidgetId: Int) {
         setResult(Activity.RESULT_OK, Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId))
         finish()
-        BalanceWidgetProvider.updateWidget(this, appWidgetId)
+        WidgetProvider.updateWidget(this, appWidgetId)
     }
 }

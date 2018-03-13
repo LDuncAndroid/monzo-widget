@@ -1,6 +1,6 @@
 package com.emmaguy.monzo.widget.login
 
-import com.emmaguy.monzo.widget.UserStorage
+import com.emmaguy.monzo.widget.storage.UserStorage
 import com.emmaguy.monzo.widget.api.MonzoApi
 import com.emmaguy.monzo.widget.api.model.Account
 import com.emmaguy.monzo.widget.api.model.AccountType

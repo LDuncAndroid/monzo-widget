@@ -1,8 +1,8 @@
-package com.emmaguy.monzo.widget
+package com.emmaguy.monzo.widget.storage
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.emmaguy.monzo.widget.api.model.AccountType
+import com.emmaguy.monzo.widget.WidgetType
 import com.emmaguy.monzo.widget.api.model.Balance
 import com.emmaguy.monzo.widget.api.model.Token
 
@@ -13,34 +13,14 @@ class UserStorage(context: Context) {
 
     private val KEY_STATE = "KEY_STATE"
 
-    private val KEY_PREPAID_ACCOUNT_ID = "KEY_PREPAID_ACCOUNT_ID"
     private val KEY_CURRENT_ACCOUNT_ID = "KEY_CURRENT_ACCOUNT_ID"
-
-    private val KEY_PREPAID_CURRENCY = "KEY_PREPAID_CURRENCY"
-    private val KEY_PREPAID_BALANCE = "KEY_PREPAID_BALANCE"
 
     private val KEY_CA_CURRENCY = "KEY_CA_CURRENCY"
     private val KEY_CA_BALANCE = "KEY_CA_BALANCE"
 
-    private val KEY_ACCOUNT_TYPE = "KEY_ACCOUNT_TYPE"
+    private val KEY_WIDGET_TYPE = "KEY_WIDGET_TYPE"
 
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences("user_storage", Context.MODE_PRIVATE)
-
-    var prepaidBalance: Balance?
-        get() {
-            val currency = sharedPreferences.getString(KEY_PREPAID_CURRENCY, null)
-            val balance = sharedPreferences.getLong(KEY_PREPAID_BALANCE, 0)
-            if (currency == null) return null
-
-            return Balance(balance, currency)
-        }
-        set(balance) {
-            sharedPreferences
-                    .edit()
-                    .putString(KEY_PREPAID_CURRENCY, balance?.currency)
-                    .putLong(KEY_PREPAID_BALANCE, balance?.balance ?: 0)
-                    .apply()
-        }
 
     var currentAccountBalance: Balance?
         get() {
@@ -64,37 +44,32 @@ class UserStorage(context: Context) {
             sharedPreferences.edit().putString(KEY_STATE, state).apply()
         }
 
-    var prepaidAccountId: String?
-        get() = sharedPreferences.getString(KEY_PREPAID_ACCOUNT_ID, null)
-        set(id) {
-            sharedPreferences.edit().putString(KEY_PREPAID_ACCOUNT_ID, id).apply()
-        }
-
     var currentAccountId: String?
         get() = sharedPreferences.getString(KEY_CURRENT_ACCOUNT_ID, null)
         set(id) {
             sharedPreferences.edit().putString(KEY_CURRENT_ACCOUNT_ID, id).apply()
         }
 
-    fun saveAccountType(widgetId: Int, accountType: AccountType) {
+    fun saveAccountType(widgetId: Int, widgetType: WidgetType) {
         sharedPreferences
                 .edit()
-                .putString(KEY_ACCOUNT_TYPE + widgetId, accountType.key)
+                .putString(KEY_WIDGET_TYPE + widgetId, widgetType.key)
                 .apply()
     }
 
     /**
-     * The account type for the given widget. Defaults to current account
+     * The widget type for the given widget. Defaults to current account
      */
-    fun accountType(widgetId: Int): AccountType {
-        val savedAccountType = sharedPreferences.getString(KEY_ACCOUNT_TYPE + widgetId, null)
-        return AccountType.find(savedAccountType) ?: AccountType.CURRENT_ACCOUNT
+    fun widgetType(widgetId: Int): WidgetType {
+        val widgetType = sharedPreferences.getString(KEY_WIDGET_TYPE + widgetId, null)
+        return WidgetType.find(widgetType)
+                ?: WidgetType.CURRENT_ACCOUNT
     }
 
     fun removeAccountType(widgetId: Int) {
         return sharedPreferences
                 .edit()
-                .remove(KEY_ACCOUNT_TYPE + widgetId)
+                .remove(KEY_WIDGET_TYPE + widgetId)
                 .apply()
     }
 
