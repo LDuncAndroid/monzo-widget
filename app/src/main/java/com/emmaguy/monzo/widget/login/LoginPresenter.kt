@@ -55,6 +55,7 @@ class LoginPresenter(
                                     .subscribeOn(ioScheduler)
                                     .observeOn(uiScheduler)
                                     .doOnError {
+                                        Timber.e(it, "Failed to log in")
                                         view.showLogIn()
                                         userStorage.state = null
                                     }

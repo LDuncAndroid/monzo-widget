@@ -1,4 +1,4 @@
-package com.emmaguy.monzo.widget.balance
+package com.emmaguy.monzo.widget.sync
 
 import com.emmaguy.monzo.widget.storage.UserStorage
 import com.emmaguy.monzo.widget.api.MonzoApi
@@ -11,12 +11,12 @@ import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations.initMocks
 import org.mockito.Mockito.`when` as whenMock
 
-class BalanceManagerTest {
+class SyncManagerTest {
     private val DEFAULT_CA_ID = "ca_id"
 
     private val BALANCE_CA = Balance(13579, "GBP")
 
-    private lateinit var balanceManager: BalanceManager
+    private lateinit var syncManager: SyncManager
 
     @Mock private lateinit var monzoApi: MonzoApi
     @Mock private lateinit var userStorage: UserStorage
@@ -28,12 +28,12 @@ class BalanceManagerTest {
 
         whenMock(monzoApi.balance(DEFAULT_CA_ID)).thenReturn(Single.just(BALANCE_CA))
 
-        balanceManager = BalanceManager(monzoApi, userStorage)
+        syncManager = SyncManager(monzoApi, userStorage)
     }
 
     @Test fun refreshBalances_noErrors() {
-        balanceManager
-                .refreshBalances()
+        syncManager
+                .sync()
                 .test()
                 .assertNoErrors()
                 .assertComplete()
@@ -42,16 +42,16 @@ class BalanceManagerTest {
     @Test fun refreshBalances_noCurrentAccount_noErrors() {
         whenMock(userStorage.currentAccountId).thenReturn(null)
 
-        balanceManager
-                .refreshBalances()
+        syncManager
+                .sync()
                 .test()
                 .assertNoErrors()
                 .assertComplete()
     }
 
     @Test fun refreshBalances_savesCurrentAccountBalance() {
-        balanceManager
-                .refreshBalances()
+        syncManager
+                .sync()
                 .test()
                 .assertNoErrors()
                 .assertComplete()

@@ -2,6 +2,7 @@ package com.emmaguy.monzo.widget.api
 
 import com.emmaguy.monzo.widget.api.model.AccountsResponse
 import com.emmaguy.monzo.widget.api.model.Balance
+import com.emmaguy.monzo.widget.api.model.PotsResponse
 import com.emmaguy.monzo.widget.api.model.Token
 import io.reactivex.Single
 import retrofit2.Call
@@ -32,4 +33,7 @@ interface MonzoApi {
 
     @GET("balance")
     fun balance(@Query("account_id") accountId: String): Single<Balance>
+
+    @GET("pots")
+    fun pots(@Query("account_id") accountId: String): Single<PotsResponse>
 }

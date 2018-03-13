@@ -5,9 +5,12 @@ import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import com.emmaguy.monzo.widget.WidgetProvider
+import android.text.TextUtils
+import android.widget.Toast
 import com.emmaguy.monzo.widget.MonzoWidgetApp
 import com.emmaguy.monzo.widget.R
+import com.emmaguy.monzo.widget.WidgetProvider
+import com.emmaguy.monzo.widget.room.PotEntity
 import com.jakewharton.rxbinding2.view.clicks
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_settings.*
@@ -37,6 +40,10 @@ class SettingsActivity : AppCompatActivity(), SettingsPresenter.View {
 
     override fun currentAccountClicks(): Observable<Unit> {
         return currentAccountButton.clicks()
+    }
+
+    override fun showPots(pots: List<PotEntity>) {
+        Toast.makeText(this, TextUtils.join(", ", pots.map { it.name }), Toast.LENGTH_SHORT).show()
     }
 
     override fun finish(appWidgetId: Int) {

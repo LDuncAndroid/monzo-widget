@@ -1,4 +1,4 @@
-package com.emmaguy.monzo.widget.balance
+package com.emmaguy.monzo.widget.sync
 
 
 import android.app.job.JobParameters
@@ -9,19 +9,19 @@ import com.emmaguy.monzo.widget.WidgetProvider
 import io.reactivex.disposables.Disposable
 import timber.log.Timber
 
-class RefreshBalanceJobService : JobService() {
-    private lateinit var balanceManager: BalanceManager
+class SyncJobService : JobService() {
+    private lateinit var syncManager: SyncManager
     private var disposable: Disposable? = null
 
     override fun onCreate() {
         super.onCreate()
 
         val app = MonzoWidgetApp.get(this)
-        balanceManager = BalanceManager(app.apiModule.monzoApi, app.storageModule.userStorage)
+        syncManager = SyncManager(app.apiModule.monzoApi, app.storageModule.userStorage, app.database.potsDao())
     }
 
     override fun onStartJob(jobParams: JobParameters?): Boolean {
-        disposable = balanceManager.refreshBalances()
+        disposable = syncManager.sync()
                 .subscribeOn(AppModule.ioScheduler())
                 .subscribe({
                     Timber.d("Successfully refreshed balance(s)")

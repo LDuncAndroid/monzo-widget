@@ -47,7 +47,7 @@
                        android:resource="@xml/widgetprovider_balance"/>
         </receiver>
 
-        <service android:name=".balance.RefreshBalanceJobService"
+        <service android:name=".sync.SyncJobService"
                  android:exported="true"
                  android:permission="android.permission.BIND_JOB_SERVICE"/>
 

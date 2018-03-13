@@ -5,6 +5,7 @@ import com.emmaguy.monzo.widget.BuildConfig
 import com.emmaguy.monzo.widget.storage.StorageModule
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import com.readystatesoftware.chuck.ChuckInterceptor
+import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -71,7 +72,7 @@ class ApiModule(
         return Retrofit.Builder()
                 .baseUrl("https://api.monzo.com")
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(MoshiConverterFactory.create(Moshi.Builder().build()))
+                .addConverterFactory(MoshiConverterFactory.create(Moshi.Builder().add(KotlinJsonAdapterFactory()).build()))
                 .client(okHttpClient)
                 .build()
                 .create(MonzoApi::class.java)

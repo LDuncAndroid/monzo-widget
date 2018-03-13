@@ -12,7 +12,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import com.emmaguy.monzo.widget.MonzoWidgetApp
 import com.emmaguy.monzo.widget.R
-import com.emmaguy.monzo.widget.balance.RefreshBalanceJobService
+import com.emmaguy.monzo.widget.sync.SyncJobService
 import com.emmaguy.monzo.widget.common.gone
 import com.emmaguy.monzo.widget.common.visible
 import com.jakewharton.rxbinding2.view.clicks
@@ -87,7 +87,7 @@ class LoginActivity : AppCompatActivity(), LoginPresenter.View {
     }
 
     override fun startBackgroundRefresh() {
-        val component = ComponentName(this, RefreshBalanceJobService::class.java)
+        val component = ComponentName(this, SyncJobService::class.java)
 
         val jobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
         jobScheduler.schedule(JobInfo.Builder(JOB_ID, component)
