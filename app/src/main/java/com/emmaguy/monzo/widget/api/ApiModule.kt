@@ -49,7 +49,7 @@ class ApiModule(
                         try {
                             val tokenResponse = call.execute()
                             if (tokenResponse.code() == 200) {
-                                val newToken = tokenResponse.body()
+                                val newToken = tokenResponse.body()!!
                                 userStorage.saveToken(newToken)
 
                                 response.request().newBuilder()
