@@ -6,19 +6,20 @@ import com.emmaguy.monzo.widget.WidgetType
 import com.emmaguy.monzo.widget.api.model.Balance
 import com.emmaguy.monzo.widget.api.model.Token
 
+private const val KEY_REFRESH_TOKEN = "KEY_REFRESH_TOKEN"
+private const val KEY_ACCESS_TOKEN = "KEY_ACCESS_TOKEN"
+private const val KEY_TOKEN_TYPE = "KEY_TOKEN_TYPE"
+
+private const val KEY_STATE = "KEY_STATE"
+
+private const val KEY_CURRENT_ACCOUNT_ID = "KEY_CURRENT_ACCOUNT_ID"
+
+private const val KEY_CA_CURRENCY = "KEY_CA_CURRENCY"
+private const val KEY_CA_BALANCE = "KEY_CA_BALANCE"
+
+private const val KEY_WIDGET_TYPE = "KEY_WIDGET_TYPE"
+
 class UserStorage(context: Context) {
-    private val KEY_REFRESH_TOKEN = "KEY_REFRESH_TOKEN"
-    private val KEY_ACCESS_TOKEN = "KEY_ACCESS_TOKEN"
-    private val KEY_TOKEN_TYPE = "KEY_TOKEN_TYPE"
-
-    private val KEY_STATE = "KEY_STATE"
-
-    private val KEY_CURRENT_ACCOUNT_ID = "KEY_CURRENT_ACCOUNT_ID"
-
-    private val KEY_CA_CURRENCY = "KEY_CA_CURRENCY"
-    private val KEY_CA_BALANCE = "KEY_CA_BALANCE"
-
-    private val KEY_WIDGET_TYPE = "KEY_WIDGET_TYPE"
 
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences("user_storage", Context.MODE_PRIVATE)
 
@@ -62,8 +63,7 @@ class UserStorage(context: Context) {
      */
     fun widgetType(widgetId: Int): WidgetType {
         val widgetType = sharedPreferences.getString(KEY_WIDGET_TYPE + widgetId, null)
-        return WidgetType.find(widgetType)
-                ?: WidgetType.CURRENT_ACCOUNT
+        return WidgetType.find(widgetType) ?: WidgetType.CURRENT_ACCOUNT
     }
 
     fun removeAccountType(widgetId: Int) {

@@ -3,7 +3,7 @@ package com.emmaguy.monzo.widget.settings
 import com.emmaguy.monzo.widget.WidgetType
 import com.emmaguy.monzo.widget.common.BasePresenter
 import com.emmaguy.monzo.widget.common.plus
-import com.emmaguy.monzo.widget.room.PotEntity
+import com.emmaguy.monzo.widget.room.DbPot
 import com.emmaguy.monzo.widget.room.PotsDao
 import com.emmaguy.monzo.widget.storage.UserStorage
 import io.reactivex.Observable
@@ -34,7 +34,7 @@ class SettingsPresenter(
 
     interface View : BasePresenter.View {
         fun currentAccountClicks(): Observable<Unit>
-        fun showPots(it: List<PotEntity>)
+        fun showPots(pots: List<DbPot>)
 
         fun finish(appWidgetId: Int)
     }

@@ -7,14 +7,14 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.customtabs.CustomTabsIntent
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.content.ContextCompat
 import com.emmaguy.monzo.widget.MonzoWidgetApp
 import com.emmaguy.monzo.widget.R
-import com.emmaguy.monzo.widget.sync.SyncJobService
 import com.emmaguy.monzo.widget.common.gone
 import com.emmaguy.monzo.widget.common.visible
+import com.emmaguy.monzo.widget.sync.SyncJobService
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Observable
@@ -40,7 +40,10 @@ class LoginActivity : AppCompatActivity(), LoginPresenter.View {
 
         val uri = intent?.data
         if (uri != null && uri.toString().startsWith(getString(R.string.callback_url_scheme))) {
-            authCodeChangedRelay.accept(Pair(uri.getQueryParameter("code"), uri.getQueryParameter("state")))
+            authCodeChangedRelay.accept(Pair(
+                    uri.getQueryParameter("code")!!,
+                    uri.getQueryParameter("state")!!
+            ))
         }
     }
 

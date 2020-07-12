@@ -1,15 +1,15 @@
 package com.emmaguy.monzo.widget.room
 
-import android.arch.persistence.room.Dao
-import android.arch.persistence.room.Insert
-import android.arch.persistence.room.Query
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.Query
 import io.reactivex.Flowable
 
 @Dao
 interface PotsDao {
     @Query("SELECT * FROM pots")
-    fun pots(): Flowable<List<PotEntity>>
+    fun pots(): Flowable<List<DbPot>>
 
     @Insert
-    fun insert(pot: PotEntity)
+    fun insert(pot: DbPot)
 }

@@ -21,6 +21,10 @@ class LoginPresenter(
         private val redirectUri: String,
         private val userStorage: UserStorage
 ) : BasePresenter<LoginPresenter.View>() {
+    // Step 1: go to https://developers.monzo.com/apps/home and create an app
+    // Step 2: copy id & secret and save
+    // Step 3: auth with this app
+    // Step 4: success
 
     override fun attachView(view: View) {
         super.attachView(view)
@@ -71,8 +75,9 @@ class LoginPresenter(
                 }
                 .doOnNext {
                     for (account in it) {
-                        when {
-                            account.type == AccountType.CURRENT_ACCOUNT -> userStorage.currentAccountId = account.id
+                        when (account.type) {
+                            AccountType.CURRENT_ACCOUNT -> userStorage.currentAccountId = account.id
+                            else -> TODO("Add support for Pots")
                         }
                     }
                 }

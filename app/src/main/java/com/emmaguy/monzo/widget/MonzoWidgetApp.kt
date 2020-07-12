@@ -1,8 +1,8 @@
 package com.emmaguy.monzo.widget
 
 import android.app.Application
-import android.arch.persistence.room.Room
 import android.content.Context
+import androidx.room.Room
 import com.emmaguy.monzo.widget.api.ApiModule
 import com.emmaguy.monzo.widget.login.LoginModule
 import com.emmaguy.monzo.widget.room.Database
@@ -12,11 +12,14 @@ import timber.log.Timber
 
 
 class MonzoWidgetApp : Application() {
-    lateinit var storageModule: StorageModule
-    lateinit var apiModule: ApiModule
-    lateinit var loginModule: LoginModule
-    lateinit var settingsModule: SettingsModule
-    lateinit var database: Database
+    val storageModule by lazy { StorageModule(this) }
+    val apiModule by lazy { ApiModule(this, storageModule) }
+    val database by lazy {
+        Room.databaseBuilder(this, Database::class.java, "db").build()
+    }
+
+    val loginModule by lazy { LoginModule(this, storageModule, apiModule) }
+    val settingsModule by lazy { SettingsModule(storageModule, database.potsDao()) }
 
     override fun onCreate() {
         super.onCreate()
@@ -24,12 +27,6 @@ class MonzoWidgetApp : Application() {
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
-
-        storageModule = StorageModule(this)
-        apiModule = ApiModule(this, storageModule)
-        loginModule = LoginModule(this, storageModule, apiModule)
-        database = Room.databaseBuilder(this, Database::class.java, "db").build()
-        settingsModule = SettingsModule(storageModule, database.potsDao())
     }
 
     companion object {

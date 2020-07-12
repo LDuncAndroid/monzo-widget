@@ -2,7 +2,8 @@ package com.emmaguy.monzo.widget.sync
 
 import android.annotation.SuppressLint
 import com.emmaguy.monzo.widget.api.MonzoApi
-import com.emmaguy.monzo.widget.room.PotEntity
+import com.emmaguy.monzo.widget.api.model.Pot
+import com.emmaguy.monzo.widget.room.DbPot
 import com.emmaguy.monzo.widget.room.PotsDao
 import com.emmaguy.monzo.widget.storage.UserStorage
 import io.reactivex.Completable
@@ -24,7 +25,7 @@ class SyncManager(
         } else {
             monzoApi.balance(currentAccountId)
                     .doOnSuccess { balance -> userStorage.currentAccountBalance = balance }
-                    .toCompletable()
+                    .ignoreElement()
         }
     }
 
@@ -36,12 +37,15 @@ class SyncManager(
         } else {
             monzoApi.pots(currentAccountId)
                     .doOnSuccess {
-                        it.pots?.forEach {
-                            val pot = PotEntity(it.id, it.name, it.balance, it.currency)
-                            potsDao.insert(pot)
+                        it.pots?.forEach { pot ->
+                            potsDao.insert(pot.toEntity())
                         }
                     }
-                    .toCompletable()
+                    .ignoreElement()
         }
     }
+}
+
+private fun Pot.toEntity(): DbPot {
+    return DbPot(id, name, balance, currency)
 }
