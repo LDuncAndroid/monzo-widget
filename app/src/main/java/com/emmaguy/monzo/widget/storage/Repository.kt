@@ -135,9 +135,9 @@ class Repository(
 
 private fun DbAccountWithBalance.toWidget(): Widget {
     val type = when (account.type) {
-        "uk_prepaid" -> "prepaid"
-        "uk_retail" -> "current"
-        "uk_retail_joint" -> "joint"
+        "uk_prepaid" -> "Prepaid"
+        "uk_retail" -> "Current"
+        "uk_retail_joint" -> "Joint"
         else -> ""
     }
 

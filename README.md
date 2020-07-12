@@ -1,6 +1,6 @@
 # monzo-widget
 
-An Android app widget for your homescreen, showing the balance of your prepaid or current account.
+An Android app widget for your homescreen, showing the balance of your accounts or Pots.
 
 <img src="preview.png" width="30%" />
 

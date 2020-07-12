@@ -17,7 +17,6 @@ import com.emmaguy.monzo.widget.common.TypefaceSpan
 import com.emmaguy.monzo.widget.common.toPx
 import com.emmaguy.monzo.widget.settings.SettingsActivity
 import com.emmaguy.monzo.widget.storage.Widget
-import timber.log.Timber
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.util.*
@@ -61,7 +60,6 @@ class WidgetProvider : AppWidgetProvider() {
 
             val widgets = repository.widgetById(id = appWidgetId).blockingGet()
             widgets.forEach {
-                Timber.d("Widget, id: $appWidgetId, obj: $it")
                 // TODO: Theming
                 val backgroundResId = R.drawable.background_light
                 val textColour = ContextCompat.getColor(context, R.color.monzo_dark)
