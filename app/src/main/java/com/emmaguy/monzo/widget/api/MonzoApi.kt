@@ -1,14 +1,11 @@
 package com.emmaguy.monzo.widget.api
 
-import com.emmaguy.monzo.widget.api.model.AccountsResponse
-import com.emmaguy.monzo.widget.api.model.Balance
-import com.emmaguy.monzo.widget.api.model.PotsResponse
-import com.emmaguy.monzo.widget.api.model.Token
 import io.reactivex.Single
 import retrofit2.Call
 import retrofit2.http.*
 
 interface MonzoApi {
+
     @FormUrlEncoded
     @POST("oauth2/token")
     fun requestAccessToken(
@@ -17,7 +14,7 @@ interface MonzoApi {
             @Field("redirect_uri") redirectUri: String,
             @Field("code") code: String,
             @Field("grant_type") grantType: String = "authorization_code"
-    ): Single<Token>
+    ): Single<ApiToken>
 
     @FormUrlEncoded
     @POST("oauth2/token")
@@ -26,14 +23,14 @@ interface MonzoApi {
             @Field("client_secret") clientSecret: String,
             @Field("refresh_token") refreshToken: String,
             @Field("grant_type") grantType: String = "refresh_token"
-    ): Call<Token>
+    ): Call<ApiToken>
 
     @GET("accounts")
     fun accounts(): Single<AccountsResponse>
 
     @GET("balance")
-    fun balance(@Query("account_id") accountId: String): Single<Balance>
+    fun balance(@Query("account_id") accountId: String): Single<ApiBalance>
 
     @GET("pots")
-    fun pots(@Query("account_id") accountId: String): Single<PotsResponse>
+    fun pots(@Query("current_account_id") accountId: String): Single<PotsResponse>
 }

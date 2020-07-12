@@ -1,14 +1,13 @@
 package com.emmaguy.monzo.widget.settings
 
-import com.emmaguy.monzo.widget.storage.UserStorage
-import com.emmaguy.monzo.widget.WidgetType
-import com.emmaguy.monzo.widget.room.PotsDao
+import com.emmaguy.monzo.widget.storage.AuthStorage
+import com.emmaguy.monzo.widget.storage.WidgetType
+import com.emmaguy.monzo.widget.storage.Storage
 import com.jakewharton.rxrelay2.PublishRelay
 import com.nhaarman.mockitokotlin2.mock
 import io.reactivex.schedulers.Schedulers
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations.initMocks
 import org.mockito.Mockito.`when` as whenever
@@ -17,8 +16,8 @@ class SettingsPresenterTest {
     private val appWidgetId = 1
     private val currentAccountRelay = PublishRelay.create<Unit>()
 
-    private val userStorage = mock<UserStorage>()
-    private val potsDao = mock<PotsDao>()
+    private val userStorage = mock<AuthStorage>()
+    private val potsDao = mock<Storage>()
 
     private lateinit var presenter: SettingsPresenter
     private val view = mock<SettingsPresenter.View>()
@@ -37,7 +36,7 @@ class SettingsPresenterTest {
 
         currentAccountRelay.accept(Unit)
 
-        verify(userStorage).saveAccountType(appWidgetId, WidgetType.CURRENT_ACCOUNT)
+        verify(userStorage).saveAccountType(appWidgetId, WidgetType.ACCOUNT)
     }
 
     @Test fun `current account clicked, finish`() {

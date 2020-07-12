@@ -3,23 +3,21 @@ package com.emmaguy.monzo.widget.login
 import android.content.Context
 import com.emmaguy.monzo.widget.AppModule
 import com.emmaguy.monzo.widget.R
-import com.emmaguy.monzo.widget.api.ApiModule
-import com.emmaguy.monzo.widget.storage.StorageModule
+import com.emmaguy.monzo.widget.storage.Repository
 
 class LoginModule(
         private val context: Context,
-        private val storageModule: StorageModule,
-        private val apiModule: ApiModule
+        private val clientId: String,
+        private val repository: Repository
 ) {
 
     fun provideLoginPresenter(): LoginPresenter {
-        return LoginPresenter(apiModule.monzoApi,
+        return LoginPresenter(
                 AppModule.uiScheduler(),
-                AppModule.ioScheduler(),
-                apiModule.clientId,
-                apiModule.clientSecret,
+                clientId,
                 provideRedirectUri(),
-                storageModule.userStorage)
+                repository
+        )
     }
 
     private fun provideRedirectUri(): String {

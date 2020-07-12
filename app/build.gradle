@@ -34,6 +34,10 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta8'
     implementation 'androidx.browser:browser:1.2.0'
 
+    // Background sync
+    implementation "androidx.work:work-runtime:$work_version"
+    implementation "androidx.work:work-rxjava2:$work_version"
+
     // Networking
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-moshi:2.9.0'

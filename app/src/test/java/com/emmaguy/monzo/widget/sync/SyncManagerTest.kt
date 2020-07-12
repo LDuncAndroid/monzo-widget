@@ -1,6 +1,6 @@
 package com.emmaguy.monzo.widget.sync
 
-import com.emmaguy.monzo.widget.storage.UserStorage
+import com.emmaguy.monzo.widget.storage.AuthStorage
 import com.emmaguy.monzo.widget.api.MonzoApi
 import com.emmaguy.monzo.widget.api.model.Balance
 import io.reactivex.Single
@@ -19,7 +19,7 @@ class SyncManagerTest {
     private lateinit var syncManager: SyncManager
 
     @Mock private lateinit var monzoApi: MonzoApi
-    @Mock private lateinit var userStorage: UserStorage
+    @Mock private lateinit var userStorage: AuthStorage
 
     @Before fun setUp() {
         initMocks(this)

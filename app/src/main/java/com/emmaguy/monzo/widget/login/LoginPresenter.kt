@@ -1,85 +1,60 @@
 package com.emmaguy.monzo.widget.login
 
-import com.emmaguy.monzo.widget.api.MonzoApi
-import com.emmaguy.monzo.widget.api.model.AccountType
 import com.emmaguy.monzo.widget.common.BasePresenter
 import com.emmaguy.monzo.widget.common.plus
-import com.emmaguy.monzo.widget.storage.UserStorage
-import io.reactivex.Maybe
+import com.emmaguy.monzo.widget.storage.Repository
 import io.reactivex.Observable
 import io.reactivex.Scheduler
 import timber.log.Timber
-import java.util.*
 
 
 class LoginPresenter(
-        private val monzoApi: MonzoApi,
         private val uiScheduler: Scheduler,
-        private val ioScheduler: Scheduler,
         private val clientId: String,
-        private val clientSecret: String,
         private val redirectUri: String,
-        private val userStorage: UserStorage
+        private val repository: Repository
 ) : BasePresenter<LoginPresenter.View>() {
+
+    // Step 1: request magic link
+    // Step 2: open email, click link
+    // Step 3: redirect & auth
+    // Step 4: SCA in monzo app
+    // Step 5: success
+
+    // Phase 2
     // Step 1: go to https://developers.monzo.com/apps/home and create an app
     // Step 2: copy id & secret and save
-    // Step 3: auth with this app
-    // Step 4: success
 
     override fun attachView(view: View) {
         super.attachView(view)
 
-        if (userStorage.hasToken()) {
+        if (repository.authenticated()) {
             view.showLoggedIn()
             view.startBackgroundRefresh()
         }
 
         disposables += view.loginClicks()
                 .subscribe {
-                    userStorage.state = UUID.randomUUID().toString()
+                    val state = repository.startLogin()
 
                     view.showRedirecting()
                     view.hideLoginButton()
                     view.startLogin("https://auth.monzo.com/?client_id=$clientId" +
                             "&redirect_uri=$redirectUri" +
                             "&response_type=code" +
-                            "&state=" + userStorage.state)
+                            "&state=" + state)
                 }
 
+        // TODO: Rewrite UI
         disposables += view.authCodeChanges()
                 .doOnNext { view.showLoading() }
                 .doOnNext { view.showLoggingIn() }
                 .flatMapMaybe { (code, state) ->
-                    when (state) {
-                        userStorage.state -> {
-                            monzoApi.requestAccessToken(clientId, clientSecret, redirectUri, code)
-                                    .doOnSuccess { token -> userStorage.saveToken(token) }
-                                    .flatMap { monzoApi.accounts() }
-                                    .map { it.accounts }
-                                    .subscribeOn(ioScheduler)
-                                    .observeOn(uiScheduler)
-                                    .doOnError {
-                                        Timber.e(it, "Failed to log in")
-                                        view.showLogIn()
-                                        userStorage.state = null
-                                    }
-                                    .toMaybe()
-                                    .onErrorResumeNext(Maybe.empty())
-                        }
-                        else -> {
-                            view.showLogIn()
-                            userStorage.state = null
-                            Maybe.empty()
-                        }
-                    }
-                }
-                .doOnNext {
-                    for (account in it) {
-                        when (account.type) {
-                            AccountType.CURRENT_ACCOUNT -> userStorage.currentAccountId = account.id
-                            else -> TODO("Add support for Pots")
-                        }
-                    }
+                    repository.login(
+                            redirectUri = redirectUri,
+                            code = code,
+                            state = state
+                    )
                 }
                 .observeOn(uiScheduler)
                 .doOnNext { view.hideLoading() }

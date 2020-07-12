@@ -2,9 +2,7 @@ package com.emmaguy.monzo.widget.api
 
 import android.content.Context
 import com.chuckerteam.chucker.api.ChuckerInterceptor
-import com.emmaguy.monzo.widget.BuildConfig
-import com.emmaguy.monzo.widget.storage.StorageModule
-import com.emmaguy.monzo.widget.storage.UserStorage
+import com.emmaguy.monzo.widget.storage.AuthStorage
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -15,16 +13,16 @@ import timber.log.Timber
 import java.io.IOException
 
 class ApiModule(
+        clientId: String,
+        clientSecret: String,
         context: Context,
-        storageModule: StorageModule
+        userStorage: AuthStorage
 ) {
-    val clientId = BuildConfig.CLIENT_ID
-    val clientSecret = BuildConfig.CLIENT_SECRET
-
-    private val userStorage = storageModule.userStorage
-    private val baseHttpClient = OkHttpClient.Builder()
-            .addInterceptor(ChuckerInterceptor(context))
-            .build()
+    private val baseHttpClient by lazy {
+        OkHttpClient.Builder()
+                .addInterceptor(ChuckerInterceptor(context))
+                .build()
+    }
 
     val monzoApi by lazy {
         baseHttpClient.newBuilder()
@@ -50,7 +48,7 @@ class ApiModule(
             private val baseHttpClient: OkHttpClient,
             private val clientId: String,
             private val clientSecret: String,
-            private val userStorage: UserStorage
+            private val userStorage: AuthStorage
     ) : Authenticator {
 
         override fun authenticate(route: Route?, response: Response): Request? {

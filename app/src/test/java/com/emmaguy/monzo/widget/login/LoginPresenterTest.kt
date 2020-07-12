@@ -1,10 +1,9 @@
 package com.emmaguy.monzo.widget.login
 
-import com.emmaguy.monzo.widget.storage.UserStorage
+import com.emmaguy.monzo.widget.storage.AuthStorage
 import com.emmaguy.monzo.widget.api.MonzoApi
-import com.emmaguy.monzo.widget.api.model.Account
-import com.emmaguy.monzo.widget.api.model.AccountType
-import com.emmaguy.monzo.widget.api.model.AccountsResponse
+import com.emmaguy.monzo.widget.api.ApiAccount
+import com.emmaguy.monzo.widget.api.AccountsResponse
 import com.emmaguy.monzo.widget.api.model.Token
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Single
@@ -25,14 +24,14 @@ class LoginPresenterTest {
     private val DEFAULT_STATE = "DEFAULT_STATE"
 
     private val defaultToken = Token("access_token", "refresh_token", "type")
-    private val prepaid = Account("pp_id", AccountType.PREPAID)
-    private val currentAccount = Account("ca_id", AccountType.CURRENT_ACCOUNT)
+    private val prepaid = ApiAccount("pp_id", AccountType.PREPAID)
+    private val currentAccount = ApiAccount("ca_id", AccountType.CURRENT_ACCOUNT)
 
     private val loginRelay = PublishRelay.create<Unit>()
     private val authCodeRelay = PublishRelay.create<Pair<String, String>>()
 
     @Mock private lateinit var monzoApi: MonzoApi
-    @Mock private lateinit var userStorage: UserStorage
+    @Mock private lateinit var userStorage: AuthStorage
 
     private lateinit var presenter: LoginPresenter
     @Mock private lateinit var view: LoginPresenter.View

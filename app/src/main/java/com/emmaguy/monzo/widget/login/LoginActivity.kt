@@ -1,31 +1,26 @@
 package com.emmaguy.monzo.widget.login
 
-import android.app.job.JobInfo
-import android.app.job.JobScheduler
-import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContextCompat
-import com.emmaguy.monzo.widget.MonzoWidgetApp
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
+import com.emmaguy.monzo.widget.App
 import com.emmaguy.monzo.widget.R
 import com.emmaguy.monzo.widget.common.gone
 import com.emmaguy.monzo.widget.common.visible
-import com.emmaguy.monzo.widget.sync.SyncJobService
+import com.emmaguy.monzo.widget.sync.SyncWorker
 import com.jakewharton.rxbinding2.view.clicks
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_login.*
-import java.util.concurrent.TimeUnit
-
 
 class LoginActivity : AppCompatActivity(), LoginPresenter.View {
-    private val JOB_ID = 1
     private val authCodeChangedRelay = PublishRelay.create<Pair<String, String>>()
-    private val presenter by lazy { MonzoWidgetApp.get(this).loginModule.provideLoginPresenter() }
+    private val presenter by lazy { App.get(this).loginModule.provideLoginPresenter() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,14 +85,8 @@ class LoginActivity : AppCompatActivity(), LoginPresenter.View {
     }
 
     override fun startBackgroundRefresh() {
-        val component = ComponentName(this, SyncJobService::class.java)
-
-        val jobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-        jobScheduler.schedule(JobInfo.Builder(JOB_ID, component)
-                .setPersisted(true)
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .setPeriodic(TimeUnit.HOURS.toMillis(1))
-                .build())
+        WorkManager.getInstance(this)
+                .enqueue(OneTimeWorkRequest.Builder(SyncWorker::class.java).build())
     }
 
     override fun showLoading() {

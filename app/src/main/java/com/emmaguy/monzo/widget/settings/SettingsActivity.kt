@@ -4,26 +4,25 @@ import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
-import com.emmaguy.monzo.widget.MonzoWidgetApp
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.emmaguy.monzo.widget.App
 import com.emmaguy.monzo.widget.R
 import com.emmaguy.monzo.widget.WidgetProvider
-import com.emmaguy.monzo.widget.room.DbPot
-import com.jakewharton.rxbinding2.view.clicks
+import com.emmaguy.monzo.widget.common.SimpleAdapter
+import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_settings.*
-
+import kotlinx.android.synthetic.main.item_row.*
+import kotlinx.android.synthetic.main.item_row.view.*
 
 class SettingsActivity : AppCompatActivity(), SettingsPresenter.View {
-    private val adapter = PotEntityAdapter()
+
+    private val rowClicks = PublishRelay.create<Row>()
+    private val rowsAdapter = RowsAdapter()
 
     private val presenter by lazy {
-        MonzoWidgetApp.get(this).settingsModule.provideSettingsPresenter(widgetId)
+        App.get(this).settingsModule.provideSettingsPresenter(widgetId)
     }
     private val widgetId by lazy {
         intent.extras!!.getInt(
@@ -39,6 +38,14 @@ class SettingsActivity : AppCompatActivity(), SettingsPresenter.View {
         setResult(RESULT_CANCELED)
 
         presenter.attachView(this)
+
+        settingsRecyclerView.apply {
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(context)
+            adapter = rowsAdapter.apply {
+                clickListener = { rowClicks.accept(it) }
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -46,34 +53,52 @@ class SettingsActivity : AppCompatActivity(), SettingsPresenter.View {
         super.onDestroy()
     }
 
-    override fun currentAccountClicks(): Observable<Unit> {
-        return currentAccountButton.clicks()
+    override fun rowClicks(): Observable<Row> {
+        return rowClicks
     }
 
-    override fun showPots(pots: List<DbPot>) {
-        adapter.submitList(pots)
+    override fun showWidgetOptions(rows: List<Row>) {
+        rowsAdapter.submitList(rows)
     }
 
     override fun finish(appWidgetId: Int) {
         val intent = Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
         setResult(Activity.RESULT_OK, intent)
         finish()
-        WidgetProvider.updateWidget(this, appWidgetId)
+        WidgetProvider.updateWidget(this, appWidgetId, AppWidgetManager.getInstance(this))
     }
 
-    class PotEntityAdapter : ListAdapter<DbPot, PotViewHolder>(DbPot.DIFF_CALLBACK) {
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PotViewHolder {
-            return PotViewHolder(TextView(parent.context))
+    class RowsAdapter : SimpleAdapter<Row>() {
+        var clickListener: ((Row) -> Unit)? = null
+
+        override fun getLayoutRes(item: Row): Int {
+            return when (item) {
+                is Row.Header -> R.layout.item_row
+                is Row.Account -> R.layout.item_row
+                is Row.Pot -> R.layout.item_row
+            }
         }
 
-        override fun onBindViewHolder(holder: PotViewHolder, position: Int) {
-            holder.bindTo(getItem(position))
+        override fun onBind(holder: ViewHolder, item: Row) {
+            when (item) {
+                is Row.Header -> item.bind(holder)
+                is Row.Account -> item.bind(holder)
+                is Row.Pot -> item.bind(holder)
+            }
         }
-    }
 
-    class PotViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bindTo(item: DbPot) {
-            (itemView as TextView).text = item.name
+        private fun Row.Header.bind(holder: ViewHolder) {
+            holder.containerView.textView.text = title
+        }
+
+        private fun Row.Account.bind(holder: ViewHolder) {
+            holder.containerView.textView.text = type
+            holder.containerView.setOnClickListener { clickListener?.invoke(this) }
+        }
+
+        private fun Row.Pot.bind(holder: ViewHolder) {
+            holder.containerView.textView.text = name
+            holder.containerView.setOnClickListener { clickListener?.invoke(this) }
         }
     }
 }

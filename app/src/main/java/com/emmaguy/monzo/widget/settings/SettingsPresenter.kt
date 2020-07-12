@@ -1,41 +1,70 @@
 package com.emmaguy.monzo.widget.settings
 
-import com.emmaguy.monzo.widget.WidgetType
 import com.emmaguy.monzo.widget.common.BasePresenter
+import com.emmaguy.monzo.widget.common.Item
 import com.emmaguy.monzo.widget.common.plus
-import com.emmaguy.monzo.widget.room.DbPot
-import com.emmaguy.monzo.widget.room.PotsDao
-import com.emmaguy.monzo.widget.storage.UserStorage
+import com.emmaguy.monzo.widget.storage.Repository
 import io.reactivex.Observable
 import io.reactivex.Scheduler
-import timber.log.Timber
-
+import io.reactivex.functions.BiFunction
 
 class SettingsPresenter(
         private val uiScheduler: Scheduler,
-        private val ioScheduler: Scheduler,
         private val appWidgetId: Int,
-        private val userStorage: UserStorage,
-        private val potsDao: PotsDao
+        private val repository: Repository
 ) : BasePresenter<SettingsPresenter.View>() {
+
+    private val accountsObservable = repository.accounts()
+            .map { it.map { account -> Row.Account(id = account.id, type = account.type) } }
+            .map { listOf(Row.Header(id = "1", title = "Accounts")) + it }
+            .replay(1)
+            .refCount()
+
+    private val potsObservable: Observable<List<Row>> = repository.pots()
+            .map { it.map { pot -> Row.Pot(id = pot.id, name = pot.name) } }
+            .map { listOf(Row.Header(id = "2", title = "Pots")) + it }
+            .replay(1)
+            .refCount()
 
     override fun attachView(view: View) {
         super.attachView(view)
 
-        disposables += potsDao.pots()
-                .subscribeOn(ioScheduler)
+        disposables += Observable.combineLatest(
+                accountsObservable,
+                potsObservable, BiFunction<List<Row>, List<Row>, List<Row>> { accounts, pots ->
+            accounts + pots
+        })
                 .observeOn(uiScheduler)
-                .subscribe { view.showPots(it) }
+                .subscribe { view.showWidgetOptions(it) }
 
-        disposables += view.currentAccountClicks()
-                .doOnNext { userStorage.saveAccountType(appWidgetId, WidgetType.CURRENT_ACCOUNT) }
-                .subscribe({ view.finish(appWidgetId) }, Timber::e)
+        disposables += view.rowClicks()
+                .flatMapSingle {
+                    when (it) {
+                        is Row.Account -> repository.saveAccountWidget(
+                                accountId = it.id,
+                                id = appWidgetId
+                        )
+                        is Row.Pot -> repository.savePotWidget(
+                                potId = it.id,
+                                id = appWidgetId
+                        )
+                        else -> throw IllegalArgumentException("Can't make a widget from the header")
+                    }
+                }
+                .observeOn(uiScheduler)
+                .subscribe { view.finish(appWidgetId) }
     }
 
     interface View : BasePresenter.View {
-        fun currentAccountClicks(): Observable<Unit>
-        fun showPots(pots: List<DbPot>)
+        fun rowClicks(): Observable<Row>
+        fun showWidgetOptions(rows: List<Row>)
 
         fun finish(appWidgetId: Int)
     }
+}
+
+sealed class Row : Item {
+    data class Header(override val id: String, val title: String) : Row()
+    data class Account(override val id: String, val type: String) : Row()
+    data class Pot(override val id: String, val name: String) : Row()
 }
