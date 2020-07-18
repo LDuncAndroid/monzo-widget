@@ -29,14 +29,8 @@ class LoginActivity : AppCompatActivity() {
                     // Show full screen loading
                     loginProgressBar.visible()
                 }
-                is LoginViewModel.State.Authenticated -> {
-                    // TODO: Show all widgets & their config
-                    loginProgressBar.gone()
-                    loginButton.gone()
-                    instructionsTextView.text = getString(R.string.login_logged_in_body)
-                }
                 is LoginViewModel.State.Unauthenticated -> {
-                    // show log in
+                    loginButton.visible()
                 }
                 is LoginViewModel.State.RequestMagicLink -> {
                     instructionsTextView.text = getString(R.string.login_redirecting_body)
@@ -50,6 +44,12 @@ class LoginActivity : AppCompatActivity() {
                     loginButton.gone()
                     loginProgressBar.visible()
                     instructionsTextView.text = getString(R.string.login_sca_required)
+                }
+                is LoginViewModel.State.Authenticated -> {
+                    // TODO: Show all widgets & their config
+                    loginProgressBar.gone()
+                    loginButton.gone()
+                    instructionsTextView.text = getString(R.string.login_logged_in_body)
                 }
             }
         })
