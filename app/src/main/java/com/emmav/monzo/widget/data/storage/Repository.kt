@@ -3,11 +3,10 @@ package com.emmav.monzo.widget.data.storage
 import com.emmav.monzo.widget.data.api.*
 import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.Scheduler
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 
 class Repository(
-    private val ioScheduler: Scheduler,
     private val monzoApi: MonzoApi,
     private val storage: Storage
 ) {
@@ -17,14 +16,14 @@ class Repository(
             .doOnSuccess {
                 storage.saveAccounts(it.map { apiAccount -> apiAccount.toDbAccount() })
             }
-            .subscribeOn(ioScheduler)
+            .subscribeOn(Schedulers.io())
     }
 
     fun syncBalance(accountId: String): Completable {
         return monzoApi.balance(accountId = accountId)
             .doOnSuccess { storage.saveBalance(it.toDbBalance(accountId = accountId)) }
             .ignoreElement()
-            .subscribeOn(ioScheduler)
+            .subscribeOn(Schedulers.io())
     }
 
     fun syncPots(accountId: String): Completable {
@@ -36,41 +35,41 @@ class Repository(
                 storage.savePots(pots)
             }
             .ignoreElement()
-            .subscribeOn(ioScheduler)
+            .subscribeOn(Schedulers.io())
     }
 
     fun saveAccountWidget(accountId: String, id: Int): Single<Unit> {
         return Single.fromCallable {
             val dbWidget = DbWidget(id = id, type = WidgetType.ACCOUNT.key, accountId = accountId, potId = null)
             storage.saveWidget(dbWidget)
-        }.subscribeOn(ioScheduler)
+        }.subscribeOn(Schedulers.io())
     }
 
     fun savePotWidget(potId: String, id: Int): Single<Unit> {
         return Single.fromCallable {
             val dbWidget = DbWidget(id = id, type = WidgetType.POT.key, accountId = null, potId = potId)
             storage.saveWidget(dbWidget)
-        }.subscribeOn(ioScheduler)
+        }.subscribeOn(Schedulers.io())
     }
 
     fun accounts(): Observable<List<DbAccount>> {
         return storage.accounts()
-            .subscribeOn(ioScheduler)
+            .subscribeOn(Schedulers.io())
     }
 
     fun pots(): Observable<List<DbPot>> {
         return storage.pots()
-            .subscribeOn(ioScheduler)
+            .subscribeOn(Schedulers.io())
     }
 
     fun widgetById(id: Int): Single<List<Widget>> {
         return storage.accountsWithBalance()
             .flatMap { dbAccountsWithBalance -> storage.pots().map { Pair(dbAccountsWithBalance, it) } }
-            .subscribeOn(ioScheduler)
+            .subscribeOn(Schedulers.io())
             .firstOrError()
             .flatMap { (dbAccountsWithBalance, dbPots) ->
                 storage.widgetById(id = id)
-                    .subscribeOn(ioScheduler)
+                    .subscribeOn(Schedulers.io())
                     .flatMap { dbWidgets ->
                         val singles = dbWidgets.mapNotNull { dbWidget ->
                             when (WidgetType.find(dbWidget.type)) {

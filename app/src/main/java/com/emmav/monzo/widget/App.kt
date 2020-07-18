@@ -7,6 +7,7 @@ import com.emmav.monzo.widget.data.api.ApiModule
 import com.emmav.monzo.widget.feature.login.LoginModule
 import com.emmav.monzo.widget.feature.settings.SettingsModule
 import com.emmav.monzo.widget.data.storage.AuthStorage
+import com.emmav.monzo.widget.data.storage.AuthenticationRepository
 import com.emmav.monzo.widget.data.storage.Database
 import com.emmav.monzo.widget.data.storage.Repository
 import timber.log.Timber
@@ -30,13 +31,18 @@ class App : Application() {
                 userStorage = userStorage
         )
     }
+    private val authRepository by lazy {
+        AuthenticationRepository(
+            clientId = clientId,
+            clientSecret = clientSecret,
+            monzoApi = apiModule.monzoApi,
+            userStorage = userStorage
+        )
+    }
+
     val repository by lazy {
         Repository(
-                clientId = clientId,
-                clientSecret = clientSecret,
-                ioScheduler = AppModule.ioScheduler(),
                 monzoApi = apiModule.monzoApi,
-                userStorage = userStorage,
                 storage = database.storage()
         )
     }
@@ -45,7 +51,7 @@ class App : Application() {
         LoginModule(
             context = this,
             clientId = clientId,
-            repository = repository
+            repository = authRepository
         )
     }
     val settingsModule by lazy { SettingsModule(repository = repository) }

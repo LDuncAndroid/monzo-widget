@@ -1,7 +1,7 @@
 package com.emmav.monzo.widget.feature.login
 
 import android.content.Context
-import com.emmav.monzo.widget.AppModule
+import androidx.work.WorkManager
 import com.emmav.monzo.widget.R
 import com.emmav.monzo.widget.data.storage.AuthenticationRepository
 
@@ -11,12 +11,12 @@ class LoginModule(
     private val repository: AuthenticationRepository
 ) {
 
-    fun provideLoginPresenter(): LoginPresenter {
-        return LoginPresenter(
-            AppModule.uiScheduler(),
+    fun provideLoginViewModel(): LoginViewModel {
+        return LoginViewModel(
             clientId,
             provideRedirectUri(),
-            repository
+            repository,
+            WorkManager.getInstance(context)
         )
     }
 

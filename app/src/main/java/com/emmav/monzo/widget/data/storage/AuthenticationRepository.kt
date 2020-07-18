@@ -2,18 +2,18 @@ package com.emmav.monzo.widget.data.storage
 
 import com.emmav.monzo.widget.data.api.MonzoApi
 import io.reactivex.Maybe
-import io.reactivex.Scheduler
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import java.util.*
 
 class AuthenticationRepository(
     private val clientId: String,
     private val clientSecret: String,
-    private val ioScheduler: Scheduler,
     private val monzoApi: MonzoApi,
     private val userStorage: AuthStorage
 ) {
-    fun authenticated(): Boolean = userStorage.hasToken
+    val hasToken: Boolean
+        get() = userStorage.hasToken
 
     fun startLogin(): String {
         return UUID.randomUUID().toString().also { userStorage.state = it }
@@ -32,7 +32,7 @@ class AuthenticationRepository(
                         userStorage.state = null
                     }
                     .map { }
-                    .subscribeOn(ioScheduler)
+                    .subscribeOn(Schedulers.io())
                     .toMaybe()
                     .onErrorResumeNext(Maybe.empty())
             }
@@ -40,5 +40,12 @@ class AuthenticationRepository(
                 // TODO: test state mismatch clears state
                 userStorage.state = null
             }
+    }
+
+    fun testAuthentication(): Single<Boolean> {
+        return Single.fromCallable {
+            val response = monzoApi.testSCA().execute()
+            response.code() != 403 && response.isSuccessful
+        }.subscribeOn(Schedulers.io())
     }
 }

@@ -2,77 +2,70 @@ package com.emmav.monzo.widget.feature.settings
 
 import com.emmav.monzo.widget.common.BasePresenter
 import com.emmav.monzo.widget.common.Item
-import com.emmav.monzo.widget.common.plus
 import com.emmav.monzo.widget.data.storage.Repository
 import io.reactivex.Observable
-import io.reactivex.Scheduler
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.BiFunction
+import io.reactivex.rxkotlin.plusAssign
 
 class SettingsPresenter(
-        private val uiScheduler: Scheduler,
-        private val appWidgetId: Int,
-        private val repository: Repository
+    private val appWidgetId: Int,
+    private val repository: Repository
 ) : BasePresenter<SettingsPresenter.View>() {
 
     private val accountsObservable = repository.accounts()
-            .map { it.map { account ->
-                Row.Account(
-                    id = account.id,
-                    type = account.type
-                )
-            } }
-            .map { listOf(
-                Row.Header(
-                    id = "1",
-                    title = "Accounts"
-                )
-            ) + it }
-            .replay(1)
-            .refCount()
+        .map { it.map { account -> Row.Account(id = account.id, type = account.type) } }
+        .map { listOf(Row.Header(id = "1", title = "Accounts")) + it }
+        .replay(1)
+        .refCount()
 
     private val potsObservable: Observable<List<Row>> = repository.pots()
-            .map { it.map { pot ->
+        .map {
+            it.map { pot ->
                 Row.Pot(
                     id = pot.id,
                     name = pot.name
                 )
-            } }
-            .map { listOf(
+            }
+        }
+        .map {
+            listOf(
                 Row.Header(
                     id = "2",
                     title = "Pots"
                 )
-            ) + it }
-            .replay(1)
-            .refCount()
+            ) + it
+        }
+        .replay(1)
+        .refCount()
 
     override fun attachView(view: View) {
         super.attachView(view)
 
         disposables += Observable.combineLatest(
-                accountsObservable,
-                potsObservable, BiFunction<List<Row>, List<Row>, List<Row>> { accounts, pots ->
-            accounts + pots
-        })
-                .observeOn(uiScheduler)
-                .subscribe { view.showWidgetOptions(it) }
+            accountsObservable,
+            potsObservable, BiFunction<List<Row>, List<Row>, List<Row>> { accounts, pots ->
+                accounts + pots
+            })
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { view.showWidgetOptions(it) }
 
         disposables += view.rowClicks()
-                .flatMapSingle {
-                    when (it) {
-                        is Row.Account -> repository.saveAccountWidget(
-                                accountId = it.id,
-                                id = appWidgetId
-                        )
-                        is Row.Pot -> repository.savePotWidget(
-                                potId = it.id,
-                                id = appWidgetId
-                        )
-                        else -> throw IllegalArgumentException("Can't make a widget from the header")
-                    }
+            .flatMapSingle {
+                when (it) {
+                    is Row.Account -> repository.saveAccountWidget(
+                        accountId = it.id,
+                        id = appWidgetId
+                    )
+                    is Row.Pot -> repository.savePotWidget(
+                        potId = it.id,
+                        id = appWidgetId
+                    )
+                    else -> throw IllegalArgumentException("Can't make a widget from the header")
                 }
-                .observeOn(uiScheduler)
-                .subscribe { view.finish(appWidgetId) }
+            }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { view.finish(appWidgetId) }
     }
 
     interface View : BasePresenter.View {

@@ -22,28 +22,28 @@ class SettingsPresenterTest {
     private lateinit var presenter: SettingsPresenter
     private val view = mock<SettingsPresenter.View>()
 
-    @Before fun setUp() {
-        initMocks(this)
-
-        whenever(view.currentAccountClicks()).thenReturn(currentAccountRelay)
-
-        presenter = SettingsPresenter(Schedulers.trampoline(), Schedulers.trampoline(),
-                appWidgetId, userStorage, potsDao)
-    }
-
-    @Test fun `current account clicks, save current account`() {
-        presenter.attachView(view)
-
-        currentAccountRelay.accept(Unit)
-
-        verify(userStorage).saveAccountType(appWidgetId, WidgetType.ACCOUNT)
-    }
-
-    @Test fun `current account clicked, finish`() {
-        presenter.attachView(view)
-
-        currentAccountRelay.accept(Unit)
-
-        verify(view).finish(appWidgetId)
-    }
+//    @Before fun setUp() {
+//        initMocks(this)
+//
+//        whenever(view.currentAccountClicks()).thenReturn(currentAccountRelay)
+//
+//        presenter = SettingsPresenter(Schedulers.trampoline(), Schedulers.trampoline(),
+//                appWidgetId, userStorage, potsDao)
+//    }
+//
+//    @Test fun `current account clicks, save current account`() {
+//        presenter.attachView(view)
+//
+//        currentAccountRelay.accept(Unit)
+//
+//        verify(userStorage).saveAccountType(appWidgetId, WidgetType.ACCOUNT)
+//    }
+//
+//    @Test fun `current account clicked, finish`() {
+//        presenter.attachView(view)
+//
+//        currentAccountRelay.accept(Unit)
+//
+//        verify(view).finish(appWidgetId)
+//    }
 }

@@ -18,4 +18,5 @@
     <string name="settings_title">Widget Settings</string>
     <string name="settings_title_current_account">Current account</string>
     <string name="settings_title_choose_type">Choose your widget type:</string>
+    <string name="login_sca_required">SCA required, go to your Monzo app to accept</string>
 </resources>

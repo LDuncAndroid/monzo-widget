@@ -9,21 +9,32 @@ interface MonzoApi {
     @FormUrlEncoded
     @POST("oauth2/token")
     fun requestAccessToken(
-            @Field("client_id") clientId: String,
-            @Field("client_secret") clientSecret: String,
-            @Field("redirect_uri") redirectUri: String,
-            @Field("code") code: String,
-            @Field("grant_type") grantType: String = "authorization_code"
+        @Field("client_id") clientId: String,
+        @Field("client_secret") clientSecret: String,
+        @Field("redirect_uri") redirectUri: String,
+        @Field("code") code: String,
+        @Field("grant_type") grantType: String = "authorization_code"
     ): Single<ApiToken>
 
     @FormUrlEncoded
     @POST("oauth2/token")
     fun refreshToken(
-            @Field("client_id") clientId: String,
-            @Field("client_secret") clientSecret: String,
-            @Field("refresh_token") refreshToken: String,
-            @Field("grant_type") grantType: String = "refresh_token"
+        @Field("client_id") clientId: String,
+        @Field("client_secret") clientSecret: String,
+        @Field("refresh_token") refreshToken: String,
+        @Field("grant_type") grantType: String = "refresh_token"
     ): Call<ApiToken>
+
+    /**
+     * In order to test the user has done strong customer authentication (aka 2FA, and accepted an
+     * in-app push notification sent to the official Monzo app). If they have not, we'll get a 403.
+     *
+     * SCA is used to protect sensitive information. We call /accounts as it's an endpoint that will
+     * always require SCA. If we call something like /ping/whoami we'll get a 200 regardless of whether SCA
+     * has been done or not, because that API doesn't need it.
+     */
+    @GET("accounts")
+    fun testSCA(): Call<Unit>
 
     @GET("accounts")
     fun accounts(): Single<AccountsResponse>
