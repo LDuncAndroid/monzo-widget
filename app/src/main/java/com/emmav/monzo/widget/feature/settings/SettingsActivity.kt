@@ -5,32 +5,24 @@ import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.emmav.monzo.widget.App
 import com.emmav.monzo.widget.R
-import com.emmav.monzo.widget.feature.appwidget.WidgetProvider
 import com.emmav.monzo.widget.common.SimpleAdapter
-import com.jakewharton.rxrelay2.PublishRelay
-import io.reactivex.Observable
+import com.emmav.monzo.widget.feature.appwidget.WidgetProvider
 import kotlinx.android.synthetic.main.activity_settings.*
 import kotlinx.android.synthetic.main.item_row.view.*
 
-class SettingsActivity : AppCompatActivity(),
-    SettingsPresenter.View {
-
-    private val rowClicks = PublishRelay.create<Row>()
-    private val rowsAdapter =
-        RowsAdapter()
-
-    private val presenter by lazy {
-        App.get(this).settingsModule.provideSettingsPresenter(widgetId)
-    }
+class SettingsActivity : AppCompatActivity() {
     private val widgetId by lazy {
         intent.extras!!.getInt(
-                AppWidgetManager.EXTRA_APPWIDGET_ID,
-                AppWidgetManager.INVALID_APPWIDGET_ID
+            AppWidgetManager.EXTRA_APPWIDGET_ID,
+            AppWidgetManager.INVALID_APPWIDGET_ID
         )
     }
+    private val viewModel by lazy { App.get(this).settingsModule.provideSettingsViewModel(widgetId) }
+    private val rowsAdapter by lazy { RowsAdapter() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,40 +30,29 @@ class SettingsActivity : AppCompatActivity(),
         setContentView(R.layout.activity_settings)
         setResult(RESULT_CANCELED)
 
-        presenter.attachView(this)
-
         settingsRecyclerView.apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context)
-            adapter = rowsAdapter.apply {
-                clickListener = { rowClicks.accept(it) }
-            }
+            adapter = rowsAdapter
         }
+
+        viewModel.state.observe(this, Observer { state ->
+            rowsAdapter.submitList(state.rows)
+
+            if (state.complete) {
+                finishWidgetSetup()
+            }
+        })
     }
 
-    override fun onDestroy() {
-        presenter.detachView()
-        super.onDestroy()
-    }
-
-    override fun rowClicks(): Observable<Row> {
-        return rowClicks
-    }
-
-    override fun showWidgetOptions(rows: List<Row>) {
-        rowsAdapter.submitList(rows)
-    }
-
-    override fun finish(appWidgetId: Int) {
+    private fun finishWidgetSetup() {
         val intent = Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
         setResult(Activity.RESULT_OK, intent)
         finish()
-        WidgetProvider.updateWidget(this, appWidgetId, AppWidgetManager.getInstance(this))
+        WidgetProvider.updateWidget(this, widgetId, AppWidgetManager.getInstance(this))
     }
 
     class RowsAdapter : SimpleAdapter<Row>() {
-        var clickListener: ((Row) -> Unit)? = null
-
         override fun getLayoutRes(item: Row): Int {
             return when (item) {
                 is Row.Header -> R.layout.item_row
@@ -94,12 +75,12 @@ class SettingsActivity : AppCompatActivity(),
 
         private fun Row.Account.bind(holder: ViewHolder) {
             holder.containerView.textView.text = type
-            holder.containerView.setOnClickListener { clickListener?.invoke(this) }
+            holder.containerView.setOnClickListener { click.invoke(Unit) }
         }
 
         private fun Row.Pot.bind(holder: ViewHolder) {
             holder.containerView.textView.text = name
-            holder.containerView.setOnClickListener { clickListener?.invoke(this) }
+            holder.containerView.setOnClickListener { click.invoke(Unit) }
         }
     }
 }

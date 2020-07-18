@@ -38,18 +38,22 @@ class Repository(
             .subscribeOn(Schedulers.io())
     }
 
-    fun saveAccountWidget(accountId: String, id: Int): Single<Unit> {
+    fun saveAccountWidget(accountId: String, id: Int): Completable {
         return Single.fromCallable {
             val dbWidget = DbWidget(id = id, type = WidgetType.ACCOUNT.key, accountId = accountId, potId = null)
             storage.saveWidget(dbWidget)
-        }.subscribeOn(Schedulers.io())
+        }
+            .ignoreElement()
+            .subscribeOn(Schedulers.io())
     }
 
-    fun savePotWidget(potId: String, id: Int): Single<Unit> {
+    fun savePotWidget(potId: String, id: Int): Completable {
         return Single.fromCallable {
             val dbWidget = DbWidget(id = id, type = WidgetType.POT.key, accountId = null, potId = potId)
             storage.saveWidget(dbWidget)
-        }.subscribeOn(Schedulers.io())
+        }
+            .ignoreElement()
+            .subscribeOn(Schedulers.io())
     }
 
     fun accounts(): Observable<List<DbAccount>> {

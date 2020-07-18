@@ -19,6 +19,7 @@ class LoginViewModelTest {
     @Rule @JvmField val rule = InstantTaskExecutorRule()
 
     private val authenticationRepository = mock<AuthenticationRepository> {
+        whenever(it.hasToken).thenReturn(true)
         whenever(it.testAuthentication()).thenReturn(Single.just(true))
     }
     private val workManager = mock<WorkManager>()
@@ -33,8 +34,6 @@ class LoginViewModelTest {
     }
 
     @Test fun `if authenticated, check SCA state`() {
-        whenever(authenticationRepository.hasToken).thenReturn(true)
-
         viewModel
 
         verify(authenticationRepository).testAuthentication()

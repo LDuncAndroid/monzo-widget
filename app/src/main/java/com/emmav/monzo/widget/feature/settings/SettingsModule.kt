@@ -4,8 +4,8 @@ import com.emmav.monzo.widget.data.storage.Repository
 
 class SettingsModule(private val repository: Repository) {
 
-    fun provideSettingsPresenter(widgetId: Int): SettingsPresenter {
-        return SettingsPresenter(
+    fun provideSettingsViewModel(widgetId: Int): SettingsViewModel {
+        return SettingsViewModel(
             widgetId,
             repository = repository
         )
