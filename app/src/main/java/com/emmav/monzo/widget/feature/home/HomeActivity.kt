@@ -12,7 +12,7 @@ import com.emmav.monzo.widget.common.SimpleAdapter
 import com.emmav.monzo.widget.common.gone
 import com.emmav.monzo.widget.common.visible
 import kotlinx.android.synthetic.main.activity_home.*
-import kotlinx.android.synthetic.main.item_row.view.*
+import kotlinx.android.synthetic.main.item_home_row.view.*
 
 class HomeActivity : AppCompatActivity() {
     private val viewModel by lazy { App.get(this).homeModule.provideHomeViewModel() }
@@ -48,7 +48,7 @@ class HomeActivity : AppCompatActivity() {
     class WidgetsAdapter : SimpleAdapter<WidgetRow>() {
         override fun getLayoutRes(item: WidgetRow): Int {
             return when (item) {
-                is WidgetRow.Widget -> R.layout.item_row
+                is WidgetRow.Widget -> R.layout.item_home_row
             }
         }
 
@@ -59,16 +59,7 @@ class HomeActivity : AppCompatActivity() {
         }
 
         private fun WidgetRow.Widget.bind(holder: ViewHolder) {
-            holder.containerView.textView.text = type.toAccountType()
-        }
-
-        private fun String.toAccountType(): String {
-            return when (this) {
-                "uk_prepaid" -> "Prepaid"
-                "uk_retail" -> "Current"
-                "uk_retail_joint" -> "Joint"
-                else -> "Other"
-            }
+            holder.containerView.homeTextView.text = title
         }
     }
 

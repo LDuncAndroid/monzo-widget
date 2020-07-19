@@ -32,12 +32,19 @@ private fun DbWidgetWithRelations.toWidget(): Widget {
     return if (pot != null) {
         Widget.Balance.Pot(
             id = id,
+            potId = pot.id,
             name = pot.name,
             balance = pot.balance,
             currency = pot.currency
         )
     } else if (account != null && balance != null) {
-        Widget.Balance.Account(id = id, type = account.type, balance = balance.balance, currency = balance.currency)
+        Widget.Balance.Account(
+            id = id,
+            type = account.type,
+            accountId = account.id,
+            balance = balance.balance,
+            currency = balance.currency
+        )
     } else {
         throw IllegalArgumentException("Invalid type of widget")
     }

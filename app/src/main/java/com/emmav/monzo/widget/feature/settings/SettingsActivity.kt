@@ -1,5 +1,6 @@
 package com.emmav.monzo.widget.feature.settings
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.content.Intent
@@ -10,18 +11,25 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.emmav.monzo.widget.App
 import com.emmav.monzo.widget.R
 import com.emmav.monzo.widget.common.SimpleAdapter
+import com.emmav.monzo.widget.common.gone
+import com.emmav.monzo.widget.common.visible
+import com.emmav.monzo.widget.feature.appwidget.EXTRA_WIDGET_TYPE_ID
 import com.emmav.monzo.widget.feature.appwidget.WidgetProvider
 import kotlinx.android.synthetic.main.activity_settings.*
-import kotlinx.android.synthetic.main.item_row.view.*
+import kotlinx.android.synthetic.main.item_widget_settings_header.view.*
+import kotlinx.android.synthetic.main.item_widget_settings_row.view.*
 
 class SettingsActivity : AppCompatActivity() {
-    private val widgetId by lazy {
+    private val appWidgetId by lazy {
         intent.extras!!.getInt(
             AppWidgetManager.EXTRA_APPWIDGET_ID,
             AppWidgetManager.INVALID_APPWIDGET_ID
         )
     }
-    private val viewModel by lazy { App.get(this).settingsModule.provideSettingsViewModel(widgetId) }
+    private val widgetTypeId by lazy { intent.extras?.getString(EXTRA_WIDGET_TYPE_ID, null) }
+    private val viewModel by lazy {
+        App.get(this).settingsModule.provideSettingsViewModel(appWidgetId, widgetTypeId)
+    }
     private val rowsAdapter by lazy { RowsAdapter() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,18 +54,18 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun finishWidgetSetup() {
-        val intent = Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
-        setResult(Activity.RESULT_OK, intent)
+        setResult(Activity.RESULT_OK, Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId))
         finish()
-        WidgetProvider.updateWidget(this, widgetId, AppWidgetManager.getInstance(this))
+        WidgetProvider.updateWidget(this, appWidgetId, AppWidgetManager.getInstance(this))
     }
 
+    @SuppressLint("SetTextI18n")
     class RowsAdapter : SimpleAdapter<Row>() {
         override fun getLayoutRes(item: Row): Int {
             return when (item) {
-                is Row.Header -> R.layout.item_row
-                is Row.Account -> R.layout.item_row
-                is Row.Pot -> R.layout.item_row
+                is Row.Header -> R.layout.item_widget_settings_header
+                is Row.Account -> R.layout.item_widget_settings_row
+                is Row.Pot -> R.layout.item_widget_settings_row
             }
         }
 
@@ -70,17 +78,27 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         private fun Row.Header.bind(holder: ViewHolder) {
-            holder.containerView.textView.text = title
+            holder.containerView.widgetSettingsHeaderRowTextView.text = title
         }
 
         private fun Row.Account.bind(holder: ViewHolder) {
-            holder.containerView.textView.text = type
+            holder.containerView.widgetSettingsRowTextView.text = "💼 $type"
             holder.containerView.setOnClickListener { click.invoke(Unit) }
+            showOrHideSelected(isSelected, holder)
         }
 
         private fun Row.Pot.bind(holder: ViewHolder) {
-            holder.containerView.textView.text = name
+            holder.containerView.widgetSettingsRowTextView.text = "🍯 $name"
             holder.containerView.setOnClickListener { click.invoke(Unit) }
+            showOrHideSelected(isSelected, holder)
+        }
+
+        private fun showOrHideSelected(isSelected: Boolean, holder: ViewHolder) {
+            if (isSelected) {
+                holder.containerView.widgetSettingsRowView.visible()
+            } else {
+                holder.containerView.widgetSettingsRowView.gone()
+            }
         }
     }
 }

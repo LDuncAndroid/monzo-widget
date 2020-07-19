@@ -22,3 +22,20 @@ internal fun ApiPot.toDbPot(accountId: String): DbPot {
     )
 }
 
+fun String.toShortAccountType(): String {
+    return when (this) {
+        "uk_prepaid" -> "Prepaid"
+        "uk_retail" -> "Current"
+        "uk_retail_joint" -> "Joint"
+        else -> "Other"
+    }
+}
+
+fun String.toLongAccountType(): String {
+    return when (this) {
+        "uk_prepaid" -> "Prepaid account"
+        "uk_retail" -> "Current account"
+        "uk_retail_joint" -> "Joint account"
+        else -> "Other account"
+    }
+}

@@ -2,6 +2,7 @@ package com.emmav.monzo.widget.feature.settings
 
 import com.emmav.monzo.widget.common.BaseViewModel
 import com.emmav.monzo.widget.common.Item
+import com.emmav.monzo.widget.data.api.toLongAccountType
 import com.emmav.monzo.widget.data.storage.MonzoRepository
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -10,16 +11,19 @@ import io.reactivex.rxkotlin.plusAssign
 
 class SettingsViewModel(
     private val appWidgetId: Int,
+    private val widgetTypeId: String?,
     private val monzoRepository: MonzoRepository
 ) : BaseViewModel<SettingsViewModel.State>(initialState = State()) {
 
-    private val accountsObservable = monzoRepository.accounts()
+    private val accountsObservable = monzoRepository.accountsWithBalance()
         .map {
-            it.map { account ->
+            it.map { dbAccountWithBalance ->
+                val id = dbAccountWithBalance.account.id
                 Row.Account(
-                    id = account.id,
-                    type = account.type,
-                    click = { onAccountClicked(account.id) })
+                    id = id,
+                    type = dbAccountWithBalance.account.type.toLongAccountType(),
+                    isSelected = id == widgetTypeId,
+                    click = { onAccountClicked(id) })
             }
         }
         .map { listOf(Row.Header(id = "1", title = "Accounts")) + it }
@@ -27,7 +31,15 @@ class SettingsViewModel(
         .refCount()
 
     private val potsObservable: Observable<List<Row>> = monzoRepository.pots()
-        .map { it.map { pot -> Row.Pot(id = pot.id, name = pot.name, click = { onPotClicked(pot.id) }) } }
+        .map {
+            it.map { pot ->
+                Row.Pot(
+                    id = pot.id,
+                    name = pot.name,
+                    isSelected = pot.id == widgetTypeId,
+                    click = { onPotClicked(pot.id) })
+            }
+        }
         .map { listOf(Row.Header(id = "2", title = "Pots")) + it }
         .replay(1)
         .refCount()
@@ -59,6 +71,17 @@ class SettingsViewModel(
 
 sealed class Row : Item {
     data class Header(override val id: String, val title: String) : Row()
-    data class Account(override val id: String, val type: String, val click: ((Unit) -> Unit)) : Row()
-    data class Pot(override val id: String, val name: String, val click: ((Unit) -> Unit)) : Row()
+    data class Account(
+        override val id: String,
+        val type: String,
+        val isSelected: Boolean,
+        val click: ((Unit) -> Unit)
+    ) : Row()
+
+    data class Pot(
+        override val id: String,
+        val name: String,
+        val isSelected: Boolean,
+        val click: ((Unit) -> Unit)
+    ) : Row()
 }

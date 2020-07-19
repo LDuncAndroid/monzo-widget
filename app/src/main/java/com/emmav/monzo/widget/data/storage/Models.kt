@@ -11,6 +11,7 @@ sealed class Widget {
             override val id: String,
             override val balance: Long,
             override val currency: String,
+            val accountId: String,
             val type: String
         ) : Balance()
 
@@ -18,6 +19,7 @@ sealed class Widget {
             override val id: String,
             override val balance: Long,
             override val currency: String,
+            val potId: String,
             val name: String
         ) : Balance()
     }

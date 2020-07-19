@@ -18,19 +18,19 @@ import com.emmav.monzo.widget.App
 import com.emmav.monzo.widget.R
 import com.emmav.monzo.widget.common.TypefaceSpan
 import com.emmav.monzo.widget.common.toPx
+import com.emmav.monzo.widget.data.api.toShortAccountType
 import com.emmav.monzo.widget.data.storage.Widget
 import com.emmav.monzo.widget.feature.settings.SettingsActivity
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.util.*
 
+const val EXTRA_WIDGET_TYPE_ID = "EXTRA_ID"
+
 class WidgetProvider : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        updateAllWidgets(
-            context,
-            appWidgetManager
-        )
+        updateAllWidgets(context, appWidgetManager)
     }
 
     @SuppressLint("CheckResult")
@@ -63,15 +63,13 @@ class WidgetProvider : AppWidgetProvider() {
             }
         }
 
-        fun updateWidget(context: Context, appWidgetId: Int, appWidgetManager: AppWidgetManager) {
+        fun updateWidget(context: Context, widgetId: Int, appWidgetManager: AppWidgetManager) {
             val repository = App.get(context = context).widgetRepository
 
             val intent = Intent(context, SettingsActivity::class.java)
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-            val pendingIntent =
-                PendingIntent.getActivity(context, appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+                .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
 
-            val it = repository.widgetById(id = appWidgetId).blockingGet()
+            val it = repository.widgetById(id = widgetId).blockingGet()
             val textColour = ContextCompat.getColor(context, R.color.monzo_dark)
 
             if (it is Widget.Balance) {
@@ -83,23 +81,25 @@ class WidgetProvider : AppWidgetProvider() {
 
                 when (it) {
                     is Widget.Balance.Account -> {
+                        intent.putExtra(EXTRA_WIDGET_TYPE_ID, it.accountId)
                         updateWidget(
                             context = context,
-                            pendingIntent = pendingIntent,
+                            pendingIntent = PendingIntent.getActivity(context, widgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT),
                             amount = spannableString,
-                            subtitle = it.type,
+                            subtitle = it.type.toShortAccountType(),
                             appWidgetManager = appWidgetManager,
-                            appWidgetId = appWidgetId
+                            appWidgetId = widgetId
                         )
                     }
                     is Widget.Balance.Pot -> {
+                        intent.putExtra(EXTRA_WIDGET_TYPE_ID, it.potId)
                         updateWidget(
                             context = context,
-                            pendingIntent = pendingIntent,
+                            pendingIntent = PendingIntent.getActivity(context, widgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT),
                             amount = spannableString,
                             subtitle = it.name,
                             appWidgetManager = appWidgetManager,
-                            appWidgetId = appWidgetId
+                            appWidgetId = widgetId
                         )
                     }
                 }

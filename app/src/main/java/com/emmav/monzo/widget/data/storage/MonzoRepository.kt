@@ -56,8 +56,8 @@ class MonzoRepository(
             .subscribeOn(Schedulers.io())
     }
 
-    fun accounts(): Observable<List<DbAccount>> {
-        return storage.accounts()
+    fun accountsWithBalance(): Observable<List<DbAccountWithBalance>> {
+        return storage.accountsWithBalance()
             .subscribeOn(Schedulers.io())
     }
 

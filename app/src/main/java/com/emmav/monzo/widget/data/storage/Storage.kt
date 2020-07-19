@@ -11,9 +11,6 @@ interface Storage {
     @Query("SELECT * FROM accounts")
     fun accountsWithBalance(): Observable<List<DbAccountWithBalance>>
 
-    @Query("SELECT * FROM accounts")
-    fun accounts(): Observable<List<DbAccount>>
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveAccounts(accounts: List<DbAccount>)
 
