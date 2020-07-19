@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name="com.emmav.monzo.widget.App"
+        android:name=".App"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -15,14 +15,18 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name="com.emmav.monzo.widget.feature.login.LoginActivity"
-            android:launchMode="singleInstance">
-
+            android:name=".feature.SplashActivity"
+            android:label="@string/splash_activity_title"
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
+        </activity>
+        <activity
+            android:name=".feature.login.LoginActivity"
+            android:label="@string/login_activity_title">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -33,26 +37,27 @@
                     android:host="@string/callback_url_host"
                     android:scheme="@string/callback_url_scheme" />
             </intent-filter>
-
         </activity>
-
         <activity
-            android:name="com.emmav.monzo.widget.feature.settings.SettingsActivity"
-            android:label="@string/settings_title">
+            android:name=".feature.settings.SettingsActivity"
+            android:label="@string/settings_activity_title">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".feature.home.HomeActivity"
+            android:label="@string/home_activity_title" />
 
-        <receiver android:name="com.emmav.monzo.widget.feature.appwidget.WidgetProvider">
+        <receiver android:name=".feature.appwidget.WidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
+
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widgetprovider_balance" />
         </receiver>
-
     </application>
 
 </manifest>

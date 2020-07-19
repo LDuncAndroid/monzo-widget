@@ -34,6 +34,9 @@ interface Storage {
     @Query("SELECT * FROM widgets WHERE id = :id")
     fun widgetById(id: Int): Single<List<DbWidget>>
 
+    @Query("SELECT * FROM widgets")
+    fun widgets(): Single<List<DbWidget>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveWidget(dbWidget: DbWidget)
 }

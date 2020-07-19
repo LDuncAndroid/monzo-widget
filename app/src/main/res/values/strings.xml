@@ -5,8 +5,13 @@
 
     <!-- App strings -->
     <string name="app_name">Monzo Widget</string>
+    <string name="splash_activity_title">@string/app_name</string>
+
+    <!-- Home -->
+    <string name="home_activity_title">Current widgets</string>
 
     <!-- Login -->
+    <string name="login_activity_title">Login with Monzo</string>
     <string name="login_action_title">Login</string>
     <string name="login_redirecting_body">Redirecting to browser - please follow the instructions to send a
         magic link email, then open the email and click on \'Log in to Monzo\'
@@ -15,7 +20,7 @@
     <string name="login_logged_in_body">Successfully logged in.\n\nDrag a widget to your homescreen and enjoy!</string>
 
     <!-- Settings -->
-    <string name="settings_title">Widget Settings</string>
+    <string name="settings_activity_title">Widget Settings</string>
     <string name="settings_title_current_account">Current account</string>
     <string name="settings_title_choose_type">Choose your widget type:</string>
     <string name="login_sca_required">SCA required, go to your Monzo app to accept</string>

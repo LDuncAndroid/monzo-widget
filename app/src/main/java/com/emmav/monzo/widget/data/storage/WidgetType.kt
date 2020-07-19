@@ -1,8 +1,8 @@
 package com.emmav.monzo.widget.data.storage
 
 enum class WidgetType(val key: String) {
-    ACCOUNT("account"),
-    POT("pot");
+    ACCOUNT_BALANCE("account_balance"),
+    POT_BALANCE("pot_balance");
 
     companion object {
 

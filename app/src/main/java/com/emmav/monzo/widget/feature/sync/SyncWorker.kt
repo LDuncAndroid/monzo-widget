@@ -17,15 +17,15 @@ class SyncWorker(
     workerParams: WorkerParameters
 ) : RxWorker(context, workerParams) {
 
-    private val repository by lazy { App.get(context).repository }
+    private val monzoRepository by lazy { App.get(context).monzoRepository }
 
     override fun createWork(): Single<Result> {
-        return repository.syncAccounts()
+        return monzoRepository.syncAccounts()
             .flatMapCompletable { accounts ->
                 Completable.merge(
                     accounts.map { account ->
-                        repository.syncBalance(accountId = account.id)
-                            .andThen(repository.syncPots(accountId = account.id))
+                        monzoRepository.syncBalance(accountId = account.id)
+                            .andThen(monzoRepository.syncPots(accountId = account.id))
                     }
                 )
             }

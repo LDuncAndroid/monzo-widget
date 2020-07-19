@@ -4,10 +4,8 @@ import android.app.Application
 import android.content.Context
 import androidx.room.Room
 import com.emmav.monzo.widget.data.api.ApiModule
-import com.emmav.monzo.widget.data.storage.LoginStorage
-import com.emmav.monzo.widget.data.storage.LoginRepository
-import com.emmav.monzo.widget.data.storage.Database
-import com.emmav.monzo.widget.data.storage.Repository
+import com.emmav.monzo.widget.data.storage.*
+import com.emmav.monzo.widget.feature.home.HomeModule
 import com.emmav.monzo.widget.feature.login.LoginModule
 import com.emmav.monzo.widget.feature.settings.SettingsModule
 import timber.log.Timber
@@ -40,12 +38,14 @@ class App : Application() {
         )
     }
 
-    val repository by lazy {
-        Repository(
+    val monzoRepository by lazy {
+        MonzoRepository(
             monzoApi = apiModule.monzoApi,
             storage = database.storage()
         )
     }
+
+    val widgetRepository by lazy { WidgetRepository(storage = database.storage()) }
 
     val loginModule by lazy {
         LoginModule(
@@ -54,7 +54,8 @@ class App : Application() {
             loginRepository = loginRepository
         )
     }
-    val settingsModule by lazy { SettingsModule(repository = repository) }
+    val settingsModule by lazy { SettingsModule(monzoRepository = monzoRepository) }
+    val homeModule by lazy { HomeModule(widgetRepository = widgetRepository) }
 
     override fun onCreate() {
         super.onCreate()

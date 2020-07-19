@@ -61,7 +61,7 @@ class WidgetProvider : AppWidgetProvider() {
         }
 
         fun updateWidget(context: Context, appWidgetId: Int, appWidgetManager: AppWidgetManager) {
-            val repository = App.get(context = context).repository
+            val repository = App.get(context = context).widgetRepository
 
             val intent = Intent(context, SettingsActivity::class.java)
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
@@ -78,7 +78,7 @@ class WidgetProvider : AppWidgetProvider() {
                 )
 
                 when (it) {
-                    is Widget.AccountWidget -> {
+                    is Widget.AccountBalance -> {
                         val currency = Currency.getInstance(it.currency)
                         numberFormat.currency = Currency.getInstance(it.currency)
                         val balance = BigDecimal(it.balance).scaleByPowerOfTen(-2).toBigInteger()
@@ -94,13 +94,13 @@ class WidgetProvider : AppWidgetProvider() {
                             context,
                             pendingIntent,
                             spannableString,
-                            it.type,
+                            it.accountType,
                             backgroundResId,
                             appWidgetManager,
                             appWidgetId
                         )
                     }
-                    is Widget.PotWidget -> {
+                    is Widget.PotBalance -> {
                         val currency = Currency.getInstance(it.currency)
                         numberFormat.currency = Currency.getInstance(it.currency)
                         val balance = BigDecimal(it.balance).scaleByPowerOfTen(-2).toBigInteger()

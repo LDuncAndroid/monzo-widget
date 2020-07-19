@@ -7,10 +7,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.emmav.monzo.widget.App
 import com.emmav.monzo.widget.R
 import com.emmav.monzo.widget.common.gone
 import com.emmav.monzo.widget.common.visible
+import com.emmav.monzo.widget.feature.home.HomeActivity
 import kotlinx.android.synthetic.main.activity_login.*
 
 class LoginActivity : AppCompatActivity() {
@@ -46,10 +48,10 @@ class LoginActivity : AppCompatActivity() {
                     instructionsTextView.text = getString(R.string.login_sca_required)
                 }
                 is LoginViewModel.State.Authenticated -> {
-                    // TODO: Show all widgets & their config
                     loginProgressBar.gone()
                     loginButton.gone()
                     instructionsTextView.text = getString(R.string.login_logged_in_body)
+                    startActivity(HomeActivity.buildIntent(this))
                 }
             }
         })

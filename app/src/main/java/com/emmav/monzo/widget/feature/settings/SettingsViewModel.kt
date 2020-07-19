@@ -2,7 +2,7 @@ package com.emmav.monzo.widget.feature.settings
 
 import com.emmav.monzo.widget.common.BaseViewModel
 import com.emmav.monzo.widget.common.Item
-import com.emmav.monzo.widget.data.storage.Repository
+import com.emmav.monzo.widget.data.storage.MonzoRepository
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.BiFunction
@@ -10,10 +10,10 @@ import io.reactivex.rxkotlin.plusAssign
 
 class SettingsViewModel(
     private val appWidgetId: Int,
-    private val repository: Repository
+    private val monzoRepository: MonzoRepository
 ) : BaseViewModel<SettingsViewModel.State>(initialState = State()) {
 
-    private val accountsObservable = repository.accounts()
+    private val accountsObservable = monzoRepository.accounts()
         .map {
             it.map { account ->
                 Row.Account(
@@ -26,7 +26,7 @@ class SettingsViewModel(
         .replay(1)
         .refCount()
 
-    private val potsObservable: Observable<List<Row>> = repository.pots()
+    private val potsObservable: Observable<List<Row>> = monzoRepository.pots()
         .map { it.map { pot -> Row.Pot(id = pot.id, name = pot.name, click = { onPotClicked(pot.id) }) } }
         .map { listOf(Row.Header(id = "2", title = "Pots")) + it }
         .replay(1)
@@ -43,13 +43,13 @@ class SettingsViewModel(
     }
 
     private fun onAccountClicked(accountId: String) {
-        disposables += repository.saveAccountWidget(accountId = accountId, id = appWidgetId)
+        disposables += monzoRepository.saveAccountWidget(accountId = accountId, id = appWidgetId)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { setState { copy(complete = true) } }
     }
 
     private fun onPotClicked(potId: String) {
-        disposables += repository.savePotWidget(potId = potId, id = appWidgetId)
+        disposables += monzoRepository.savePotWidget(potId = potId, id = appWidgetId)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { setState { copy(complete = true) } }
     }
