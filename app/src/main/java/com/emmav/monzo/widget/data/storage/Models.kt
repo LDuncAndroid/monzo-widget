@@ -3,10 +3,22 @@ package com.emmav.monzo.widget.data.storage
 sealed class Widget {
     abstract val id: String
 
-    data class AccountBalance(
-        override val id: String,
-        val accountType: String, val balance: Long, val currency: String
-    ) : Widget()
+    sealed class Balance : Widget() {
+        abstract val balance: Long
+        abstract val currency: String
 
-    data class PotBalance(override val id: String, val name: String, val balance: Long, val currency: String) : Widget()
+        data class Account(
+            override val id: String,
+            override val balance: Long,
+            override val currency: String,
+            val type: String
+        ) : Balance()
+
+        data class Pot(
+            override val id: String,
+            override val balance: Long,
+            override val currency: String,
+            val name: String
+        ) : Balance()
+    }
 }

@@ -1,81 +1,44 @@
 package com.emmav.monzo.widget.data.storage
 
+import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Observable
-import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 
 class WidgetRepository(private val storage: Storage) {
 
-    fun widgetById(id: Int): Single<List<Widget>> {
-        return storage.accountsWithBalance()
-            .flatMap { dbAccountsWithBalance -> storage.pots().map { Pair(dbAccountsWithBalance, it) } }
-            .firstOrError()
+    fun widgetById(id: Int): Maybe<Widget> {
+        return storage.widgetById(id = id)
+            .filter { it.isNotEmpty() }
+            .map { dbWidgets -> dbWidgets.map { it.toWidget() }.first() }
             .subscribeOn(Schedulers.io())
-            .flatMap { (dbAccountsWithBalance, dbPots) ->
-                storage.widgetById(id = id)
-                    .subscribeOn(Schedulers.io())
-                    .flatMap { dbWidgets -> toWidgets(dbWidgets, dbAccountsWithBalance, dbPots) }
-            }
-    }
-
-    private fun toWidgets(
-        dbWidgets: List<DbWidget>,
-        dbAccountsWithBalance: List<DbAccountWithBalance>,
-        dbPots: List<DbPot>
-    ): Single<List<Widget>> {
-        val singles = dbWidgets.mapNotNull { dbWidget ->
-            when (WidgetType.find(dbWidget.type)) {
-                WidgetType.ACCOUNT_BALANCE -> {
-                    val accountWithBalance = dbAccountsWithBalance
-                        .firstOrNull { it.account.id == dbWidget.accountId }
-                    if (accountWithBalance == null) {
-                        null
-                    } else {
-                        Single.just(accountWithBalance.toWidget(widgetId = dbWidget.id.toString()))
-                    }
-                }
-                WidgetType.POT_BALANCE -> {
-                    val pot = dbPots.firstOrNull { it.id == dbWidget.potId }
-                    if (pot == null) {
-                        null
-                    } else {
-                        Single.just(pot.toWidget(widgetId = dbWidget.id.toString()))
-                    }
-                }
-                else -> null
-            }
-        }
-        return Single.merge(singles).toList()
     }
 
     fun allWidgets(): Observable<List<Widget>> {
-        return storage.accountsWithBalance()
-            .flatMap { dbAccountsWithBalance -> storage.pots().map { Pair(dbAccountsWithBalance, it) } }
-            .flatMapSingle { (dbAccountsWithBalance, dbPots) ->
-                storage.widgets()
-                    .subscribeOn(Schedulers.io())
-                    .flatMap { dbWidgets -> toWidgets(dbWidgets, dbAccountsWithBalance, dbPots) }
-            }
+        return storage.widgets()
+            .map { dbWidgets -> dbWidgets.map { it.toWidget() } }
             .subscribeOn(Schedulers.io())
     }
-}
 
-private fun DbAccountWithBalance.toWidget(widgetId: String): Widget {
-    val type = when (account.type) {
-        "uk_prepaid" -> "Prepaid"
-        "uk_retail" -> "Current"
-        "uk_retail_joint" -> "Joint"
-        else -> "Other"
+    fun deleteRemovedWidgets(widgetIds: List<Int>): Completable {
+        return Completable.fromCallable {
+            storage.deleteAllWidgetsExcept(widgetIds = widgetIds)
+        }.subscribeOn(Schedulers.io())
     }
-
-    return Widget.AccountBalance(
-        id = widgetId,
-        accountType = type,
-        balance = balance.balance,
-        currency = balance.currency
-    )
 }
 
-private fun DbPot.toWidget(widgetId: String): Widget {
-    return Widget.PotBalance(id = widgetId, name = name, balance = balance, currency = currency)
+private fun DbWidgetWithRelations.toWidget(): Widget {
+    val id = widget.id.toString()
+    return if (pot != null) {
+        Widget.Balance.Pot(
+            id = id,
+            name = pot.name,
+            balance = pot.balance,
+            currency = pot.currency
+        )
+    } else if (account != null && balance != null) {
+        Widget.Balance.Account(id = id, type = account.type, balance = balance.balance, currency = balance.currency)
+    } else {
+        throw IllegalArgumentException("Invalid type of widget")
+    }
 }

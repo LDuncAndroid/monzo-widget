@@ -59,12 +59,20 @@ class HomeActivity : AppCompatActivity() {
         }
 
         private fun WidgetRow.Widget.bind(holder: ViewHolder) {
-            holder.containerView.textView.text = type
+            holder.containerView.textView.text = type.toAccountType()
+        }
+
+        private fun String.toAccountType(): String {
+            return when (this) {
+                "uk_prepaid" -> "Prepaid"
+                "uk_retail" -> "Current"
+                "uk_retail_joint" -> "Joint"
+                else -> "Other"
+            }
         }
     }
 
     companion object {
-
         fun buildIntent(context: Context): Intent {
             return Intent(context, HomeActivity::class.java)
         }

@@ -1,15 +1,13 @@
 package com.emmav.monzo.widget.data.storage
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import io.reactivex.Observable
 import io.reactivex.Single
 
 @Dao
 interface Storage {
 
+    @Transaction
     @Query("SELECT * FROM accounts")
     fun accountsWithBalance(): Observable<List<DbAccountWithBalance>>
 
@@ -31,12 +29,17 @@ interface Storage {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun savePots(pots: List<DbPot>)
 
+    @Transaction
     @Query("SELECT * FROM widgets WHERE id = :id")
-    fun widgetById(id: Int): Single<List<DbWidget>>
+    fun widgetById(id: Int): Single<List<DbWidgetWithRelations>>
 
+    @Transaction
     @Query("SELECT * FROM widgets")
-    fun widgets(): Single<List<DbWidget>>
+    fun widgets(): Observable<List<DbWidgetWithRelations>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveWidget(dbWidget: DbWidget)
+
+    @Query("DELETE FROM widgets WHERE id NOT IN (:widgetIds)")
+    fun deleteAllWidgetsExcept(widgetIds: List<Int>)
 }

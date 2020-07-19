@@ -35,6 +35,21 @@ data class DbWidget(
     val potId: String?
 )
 
+data class DbWidgetWithRelations(
+    @Embedded val widget: DbWidget,
+
+    // Either Account & Balance
+    @Relation(entity = DbAccount::class, entityColumn = "id", parentColumn = "accountId")
+    val account: DbAccount?,
+
+    @Relation(entity = DbBalance::class, entityColumn = "accountId", parentColumn = "accountId")
+    val balance: DbBalance?,
+
+    // OR Pot
+    @Relation(entity = DbPot::class, entityColumn = "id", parentColumn = "potId")
+    val pot: DbPot?
+)
+
 data class DbAccountWithBalance(
     @Embedded val account: DbAccount,
 

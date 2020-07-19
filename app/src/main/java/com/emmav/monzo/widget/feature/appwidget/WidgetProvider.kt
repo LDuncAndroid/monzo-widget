@@ -1,5 +1,6 @@
 package com.emmav.monzo.widget.feature.appwidget
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
@@ -26,18 +27,16 @@ import java.util.*
 class WidgetProvider : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        // TODO: update db to remove and keep in sync
         updateAllWidgets(
             context,
             appWidgetManager
         )
     }
 
+    @SuppressLint("CheckResult")
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {
-        // TODO: update db to remove and keep in sync
-        for (widgetId in appWidgetIds) {
-//            userStorage.removeAccountType(widgetId)
-        }
+        val repository = App.get(context = context).widgetRepository
+        repository.deleteRemovedWidgets(widgetIds = appWidgetIds.toList()).blockingGet()
     }
 
     companion object {
@@ -47,9 +46,13 @@ class WidgetProvider : AppWidgetProvider() {
             maximumFractionDigits = 0
         }
 
+        @SuppressLint("CheckResult")
         fun updateAllWidgets(context: Context, appWidgetManager: AppWidgetManager) {
             val thisWidget = ComponentName(context, WidgetProvider::class.java)
             val allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget)
+
+            val repository = App.get(context = context).widgetRepository
+            repository.deleteRemovedWidgets(widgetIds = allWidgetIds.toList()).blockingGet()
 
             for (i in allWidgetIds) {
                 updateWidget(
@@ -68,60 +71,35 @@ class WidgetProvider : AppWidgetProvider() {
             val pendingIntent =
                 PendingIntent.getActivity(context, appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 
-            val widgets = repository.widgetById(id = appWidgetId).blockingGet()
-            widgets.forEach {
-                // TODO: Theming
-                val backgroundResId = R.drawable.background_light
-                val textColour = ContextCompat.getColor(
-                    context,
-                    R.color.monzo_dark
-                )
+            val it = repository.widgetById(id = appWidgetId).blockingGet()
+            val textColour = ContextCompat.getColor(context, R.color.monzo_dark)
+
+            if (it is Widget.Balance) {
+                val currency = Currency.getInstance(it.currency)
+                numberFormat.currency = currency
+
+                val balance = numberFormat.format(BigDecimal(it.balance).scaleByPowerOfTen(-2).toBigInteger())
+                val spannableString = createSpannableForBalance(context, currency.symbol, balance, textColour)
 
                 when (it) {
-                    is Widget.AccountBalance -> {
-                        val currency = Currency.getInstance(it.currency)
-                        numberFormat.currency = Currency.getInstance(it.currency)
-                        val balance = BigDecimal(it.balance).scaleByPowerOfTen(-2).toBigInteger()
-                        val spannableString =
-                            createSpannableForBalance(
-                                context, currency.symbol,
-                                numberFormat.format(
-                                    balance
-                                ), textColour
-                            )
-
+                    is Widget.Balance.Account -> {
                         updateWidget(
-                            context,
-                            pendingIntent,
-                            spannableString,
-                            it.accountType,
-                            backgroundResId,
-                            appWidgetManager,
-                            appWidgetId
+                            context = context,
+                            pendingIntent = pendingIntent,
+                            amount = spannableString,
+                            subtitle = it.type,
+                            appWidgetManager = appWidgetManager,
+                            appWidgetId = appWidgetId
                         )
                     }
-                    is Widget.PotBalance -> {
-                        val currency = Currency.getInstance(it.currency)
-                        numberFormat.currency = Currency.getInstance(it.currency)
-                        val balance = BigDecimal(it.balance).scaleByPowerOfTen(-2).toBigInteger()
-                        val spannableString =
-                            createSpannableForBalance(
-                                context,
-                                currency.symbol,
-                                numberFormat.format(
-                                    balance
-                                ),
-                                textColour
-                            )
-
+                    is Widget.Balance.Pot -> {
                         updateWidget(
-                            context,
-                            pendingIntent,
-                            spannableString,
-                            it.name,
-                            backgroundResId,
-                            appWidgetManager,
-                            appWidgetId
+                            context = context,
+                            pendingIntent = pendingIntent,
+                            amount = spannableString,
+                            subtitle = it.name,
+                            appWidgetManager = appWidgetManager,
+                            appWidgetId = appWidgetId
                         )
                     }
                 }
@@ -133,19 +111,15 @@ class WidgetProvider : AppWidgetProvider() {
             pendingIntent: PendingIntent,
             amount: SpannableString,
             subtitle: String,
-            backgroundResId: Int,
             appWidgetManager: AppWidgetManager,
             appWidgetId: Int
         ) {
-            val remoteViews = RemoteViews(
-                context.packageName,
-                R.layout.widget_balance
-            )
-            remoteViews.setOnClickPendingIntent(R.id.widgetViewGroup, pendingIntent)
-            remoteViews.setTextViewText(R.id.widgetAmountTextView, amount)
-            remoteViews.setTextViewText(R.id.widgetSubtitleTextView, subtitle)
-            remoteViews.setInt(R.id.widgetBackgroundView, "setBackgroundResource", backgroundResId)
-            appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
+            val views = RemoteViews(context.packageName, R.layout.widget_balance)
+            views.setOnClickPendingIntent(R.id.widgetViewGroup, pendingIntent)
+            views.setTextViewText(R.id.widgetAmountTextView, amount)
+            views.setTextViewText(R.id.widgetSubtitleTextView, subtitle)
+            views.setInt(R.id.widgetBackgroundView, "setBackgroundResource", R.drawable.background_light)
+            appWidgetManager.updateAppWidget(appWidgetId, views)
         }
 
         private fun createSpannableForBalance(
@@ -171,50 +145,13 @@ class WidgetProvider : AppWidgetProvider() {
             }
 
             val span = SpannableString(balance)
-            applyToCurrency(
-                span,
-                currency,
-                AbsoluteSizeSpan(currencySize.toPx(context))
-            )
-            applyToCurrency(
-                span,
-                currency,
-                ForegroundColorSpan(textColour)
-            )
-            applyToCurrency(
-                span,
-                currency,
-                TypefaceSpan(
-                    Typeface.create(
-                        ROBOTO_LIGHT,
-                        Typeface.NORMAL
-                    )
-                )
-            )
+            applyToCurrency(span, currency, AbsoluteSizeSpan(currencySize.toPx(context)))
+            applyToCurrency(span, currency, ForegroundColorSpan(textColour))
+            applyToCurrency(span, currency, TypefaceSpan(Typeface.create(ROBOTO_LIGHT, Typeface.NORMAL)))
 
-            applyToIntegerPart(
-                span,
-                currency,
-                balance,
-                AbsoluteSizeSpan(integerPartSize.toPx(context))
-            )
-            applyToIntegerPart(
-                span,
-                currency,
-                balance,
-                ForegroundColorSpan(textColour)
-            )
-            applyToIntegerPart(
-                span,
-                currency,
-                balance,
-                TypefaceSpan(
-                    Typeface.create(
-                        ROBOTO_REGULAR,
-                        Typeface.NORMAL
-                    )
-                )
-            )
+            applyToIntegerPart(span, currency, balance, AbsoluteSizeSpan(integerPartSize.toPx(context)))
+            applyToIntegerPart(span, currency, balance, ForegroundColorSpan(textColour))
+            applyToIntegerPart(span, currency, balance, TypefaceSpan(Typeface.create(ROBOTO_REGULAR, Typeface.NORMAL)))
 
             return span
         }

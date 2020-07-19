@@ -8,7 +8,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 
 class HomeViewModel(
-    private val widgetRepository: WidgetRepository
+    widgetRepository: WidgetRepository
 ) : BaseViewModel<HomeViewModel.State>(initialState = State()) {
 
     init {
@@ -22,8 +22,8 @@ class HomeViewModel(
 
 private fun Widget.toRow(): WidgetRow {
     val type = when (this) {
-        is Widget.AccountBalance -> "account balance"
-        is Widget.PotBalance -> "pot balance"
+        is Widget.Balance.Account -> "account balance"
+        is Widget.Balance.Pot -> "pot balance"
     }
 
     return WidgetRow.Widget(id = id, type = type)
