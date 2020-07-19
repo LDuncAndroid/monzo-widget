@@ -23,11 +23,11 @@ class AuthStorage(context: Context) {
 
     fun saveToken(token: ApiToken) {
         sharedPreferences
-                .edit()
-                .putString(KEY_REFRESH_TOKEN, token.refreshToken)
-                .putString(KEY_ACCESS_TOKEN, token.accessToken)
-                .putString(KEY_TOKEN_TYPE, token.tokenType)
-                .apply()
+            .edit()
+            .putString(KEY_REFRESH_TOKEN, token.refreshToken)
+            .putString(KEY_ACCESS_TOKEN, token.accessToken)
+            .putString(KEY_TOKEN_TYPE, token.tokenType)
+            .apply()
     }
 
     val hasToken: Boolean

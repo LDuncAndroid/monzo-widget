@@ -4,12 +4,12 @@ import android.app.Application
 import android.content.Context
 import androidx.room.Room
 import com.emmav.monzo.widget.data.api.ApiModule
-import com.emmav.monzo.widget.feature.login.LoginModule
-import com.emmav.monzo.widget.feature.settings.SettingsModule
 import com.emmav.monzo.widget.data.storage.AuthStorage
 import com.emmav.monzo.widget.data.storage.AuthenticationRepository
 import com.emmav.monzo.widget.data.storage.Database
 import com.emmav.monzo.widget.data.storage.Repository
+import com.emmav.monzo.widget.feature.login.LoginModule
+import com.emmav.monzo.widget.feature.settings.SettingsModule
 import timber.log.Timber
 
 class App : Application() {
@@ -19,16 +19,16 @@ class App : Application() {
     private val userStorage by lazy { AuthStorage(this) }
     private val database by lazy {
         Room.databaseBuilder(this, Database::class.java, "db")
-                .fallbackToDestructiveMigration()
-                .build()
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     private val apiModule by lazy {
         ApiModule(
-                clientId = clientId,
-                clientSecret = clientSecret,
-                context = this,
-                userStorage = userStorage
+            clientId = clientId,
+            clientSecret = clientSecret,
+            context = this,
+            userStorage = userStorage
         )
     }
     private val authRepository by lazy {
@@ -42,8 +42,8 @@ class App : Application() {
 
     val repository by lazy {
         Repository(
-                monzoApi = apiModule.monzoApi,
-                storage = database.storage()
+            monzoApi = apiModule.monzoApi,
+            storage = database.storage()
         )
     }
 

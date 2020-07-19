@@ -13,42 +13,41 @@ import timber.log.Timber
 import java.io.IOException
 
 class ApiModule(
-        clientId: String,
-        clientSecret: String,
-        context: Context,
-        userStorage: AuthStorage
+    clientId: String,
+    clientSecret: String,
+    context: Context,
+    userStorage: AuthStorage
 ) {
     private val baseHttpClient by lazy {
         OkHttpClient.Builder()
-                .addInterceptor(ChuckerInterceptor(context))
-                .build()
+            .addInterceptor(ChuckerInterceptor(context))
+            .build()
     }
 
     val monzoApi by lazy {
         baseHttpClient.newBuilder()
-                .addInterceptor { chain ->
-                    val original = chain.request()
-
-                    val requestBuilder = original.newBuilder()
-                            .header("Accept", "application/json")
-                            .header("Content-type", "application/json")
-
-                    if (userStorage.hasToken) {
-                        requestBuilder.header("Authorization", "${userStorage.tokenType} ${userStorage.accessToken}")
+            .addInterceptor { chain ->
+                val requestBuilder = chain.request().newBuilder()
+                    .header("Accept", "application/json")
+                    .header("Content-type", "application/json")
+                    .also {
+                        if (userStorage.hasToken) {
+                            it.header("Authorization", "${userStorage.tokenType} ${userStorage.accessToken}")
+                        }
                     }
 
-                    chain.proceed(requestBuilder.build())
-                }
-                .authenticator(MonzoAuthenticator(baseHttpClient, clientId, clientSecret, userStorage))
-                .build()
-                .createMonzoApi()
+                chain.proceed(requestBuilder.build())
+            }
+            .authenticator(MonzoAuthenticator(baseHttpClient, clientId, clientSecret, userStorage))
+            .build()
+            .createMonzoApi()
     }
 
     class MonzoAuthenticator(
-            private val baseHttpClient: OkHttpClient,
-            private val clientId: String,
-            private val clientSecret: String,
-            private val userStorage: AuthStorage
+        private val baseHttpClient: OkHttpClient,
+        private val clientId: String,
+        private val clientSecret: String,
+        private val userStorage: AuthStorage
     ) : Authenticator {
 
         override fun authenticate(route: Route?, response: Response): Request? {
@@ -63,8 +62,8 @@ class ApiModule(
                         userStorage.saveToken(newToken)
 
                         response.request.newBuilder()
-                                .header("Authorization", "${newToken.tokenType} ${newToken.accessToken}")
-                                .build()
+                            .header("Authorization", "${newToken.tokenType} ${newToken.accessToken}")
+                            .build()
                     }
                 } catch (e: IOException) {
                     Timber.e(e, "Exception whilst trying to refresh token")
@@ -79,12 +78,12 @@ class ApiModule(
         private fun OkHttpClient.createMonzoApi(): MonzoApi {
             val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
             return Retrofit.Builder()
-                    .baseUrl("https://api.monzo.com")
-                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                    .addConverterFactory(MoshiConverterFactory.create(moshi))
-                    .client(this)
-                    .build()
-                    .create(MonzoApi::class.java)
+                .baseUrl("https://api.monzo.com")
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addConverterFactory(MoshiConverterFactory.create(moshi))
+                .client(this)
+                .build()
+                .create(MonzoApi::class.java)
         }
     }
 }

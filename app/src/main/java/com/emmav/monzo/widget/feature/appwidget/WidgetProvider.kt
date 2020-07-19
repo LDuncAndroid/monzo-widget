@@ -17,8 +17,8 @@ import com.emmav.monzo.widget.App
 import com.emmav.monzo.widget.R
 import com.emmav.monzo.widget.common.TypefaceSpan
 import com.emmav.monzo.widget.common.toPx
-import com.emmav.monzo.widget.feature.settings.SettingsActivity
 import com.emmav.monzo.widget.data.storage.Widget
+import com.emmav.monzo.widget.feature.settings.SettingsActivity
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.util.*
@@ -65,13 +65,15 @@ class WidgetProvider : AppWidgetProvider() {
 
             val intent = Intent(context, SettingsActivity::class.java)
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-            val pendingIntent = PendingIntent.getActivity(context, appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            val pendingIntent =
+                PendingIntent.getActivity(context, appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 
             val widgets = repository.widgetById(id = appWidgetId).blockingGet()
             widgets.forEach {
                 // TODO: Theming
                 val backgroundResId = R.drawable.background_light
-                val textColour = ContextCompat.getColor(context,
+                val textColour = ContextCompat.getColor(
+                    context,
                     R.color.monzo_dark
                 )
 
@@ -127,15 +129,16 @@ class WidgetProvider : AppWidgetProvider() {
         }
 
         private fun updateWidget(
-                context: Context,
-                pendingIntent: PendingIntent,
-                amount: SpannableString,
-                subtitle: String,
-                backgroundResId: Int,
-                appWidgetManager: AppWidgetManager,
-                appWidgetId: Int
+            context: Context,
+            pendingIntent: PendingIntent,
+            amount: SpannableString,
+            subtitle: String,
+            backgroundResId: Int,
+            appWidgetManager: AppWidgetManager,
+            appWidgetId: Int
         ) {
-            val remoteViews = RemoteViews(context.packageName,
+            val remoteViews = RemoteViews(
+                context.packageName,
                 R.layout.widget_balance
             )
             remoteViews.setOnClickPendingIntent(R.id.widgetViewGroup, pendingIntent)
@@ -146,10 +149,10 @@ class WidgetProvider : AppWidgetProvider() {
         }
 
         private fun createSpannableForBalance(
-                context: Context,
-                currency: String,
-                balance: String,
-                textColour: Int
+            context: Context,
+            currency: String,
+            balance: String,
+            textColour: Int
         ): SpannableString {
             // Some supremely crude scaling as balance gets larger
             val currencySize = when {

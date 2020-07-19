@@ -14,11 +14,11 @@ internal fun ApiBalance.toDbBalance(accountId: String): DbBalance {
 
 internal fun ApiPot.toDbPot(accountId: String): DbPot {
     return DbPot(
-            id = id,
-            accountId = accountId,
-            name = name,
-            balance = balance,
-            currency = currency
+        id = id,
+        accountId = accountId,
+        name = name,
+        balance = balance,
+        currency = currency
     )
 }
 
