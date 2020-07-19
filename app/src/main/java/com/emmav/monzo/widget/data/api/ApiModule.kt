@@ -2,7 +2,7 @@ package com.emmav.monzo.widget.data.api
 
 import android.content.Context
 import com.chuckerteam.chucker.api.ChuckerInterceptor
-import com.emmav.monzo.widget.data.storage.AuthStorage
+import com.emmav.monzo.widget.data.storage.LoginStorage
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -16,7 +16,7 @@ class ApiModule(
     clientId: String,
     clientSecret: String,
     context: Context,
-    userStorage: AuthStorage
+    loginStorage: LoginStorage
 ) {
     private val baseHttpClient by lazy {
         OkHttpClient.Builder()
@@ -31,14 +31,14 @@ class ApiModule(
                     .header("Accept", "application/json")
                     .header("Content-type", "application/json")
                     .also {
-                        if (userStorage.hasToken) {
-                            it.header("Authorization", "${userStorage.tokenType} ${userStorage.accessToken}")
+                        if (loginStorage.hasToken) {
+                            it.header("Authorization", "${loginStorage.tokenType} ${loginStorage.accessToken}")
                         }
                     }
 
                 chain.proceed(requestBuilder.build())
             }
-            .authenticator(MonzoAuthenticator(baseHttpClient, clientId, clientSecret, userStorage))
+            .authenticator(MonzoAuthenticator(baseHttpClient, clientId, clientSecret, loginStorage))
             .build()
             .createMonzoApi()
     }
@@ -47,19 +47,19 @@ class ApiModule(
         private val baseHttpClient: OkHttpClient,
         private val clientId: String,
         private val clientSecret: String,
-        private val userStorage: AuthStorage
+        private val loginStorage: LoginStorage
     ) : Authenticator {
 
         override fun authenticate(route: Route?, response: Response): Request? {
             return synchronized(this) {
                 // Make a new instance to avoid making another call with our expired access token
                 val monzoApi = baseHttpClient.createMonzoApi()
-                val call = monzoApi.refreshToken(clientId, clientSecret, userStorage.refreshToken!!)
+                val call = monzoApi.refreshToken(clientId, clientSecret, loginStorage.refreshToken!!)
                 try {
                     val tokenResponse = call.execute()
                     if (tokenResponse.code() == 200) {
                         val newToken = tokenResponse.body()!!
-                        userStorage.saveToken(newToken)
+                        loginStorage.saveToken(newToken)
 
                         response.request.newBuilder()
                             .header("Authorization", "${newToken.tokenType} ${newToken.accessToken}")

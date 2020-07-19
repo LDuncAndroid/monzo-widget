@@ -3,7 +3,7 @@ package com.emmav.monzo.widget.feature.login
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.emmav.monzo.widget.common.BaseViewModel
-import com.emmav.monzo.widget.data.storage.AuthenticationRepository
+import com.emmav.monzo.widget.data.storage.LoginRepository
 import com.emmav.monzo.widget.feature.sync.SyncWorker
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -13,12 +13,12 @@ import java.util.concurrent.TimeUnit
 class LoginViewModel(
     private val clientId: String,
     private val redirectUri: String,
-    private val authenticationRepository: AuthenticationRepository,
+    private val loginRepository: LoginRepository,
     private val workManager: WorkManager
 ) : BaseViewModel<LoginViewModel.State>(initialState = State.Unknown) {
 
     init {
-        if (authenticationRepository.hasToken) {
+        if (loginRepository.hasToken) {
             setPreSCAAndSync()
         } else {
             setState { State.Unauthenticated }
@@ -33,7 +33,7 @@ class LoginViewModel(
 
         // Check 2 seconds after invoked, then every 10
         disposables += Observable.interval(2, 10, TimeUnit.SECONDS)
-            .flatMapSingle { authenticationRepository.testAuthentication() }
+            .flatMapSingle { loginRepository.testAuthentication() }
             .filter { isAuthenticated -> isAuthenticated }
             .take(1) // Once we're logged in, we no longer need to poll
             .ignoreElements()
@@ -50,14 +50,14 @@ class LoginViewModel(
                 url = "https://auth.monzo.com/?client_id=$clientId" +
                         "&redirect_uri=$redirectUri" +
                         "&response_type=code" +
-                        "&state=" + authenticationRepository.startLogin()
+                        "&state=" + loginRepository.startLogin()
             )
         }
     }
 
     fun onMagicLinkParamsReceived(code: String, state: String) {
         setState { State.Authenticating }
-        disposables += authenticationRepository.login(redirectUri, code, state)
+        disposables += loginRepository.login(redirectUri, code, state)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { setPreSCAAndSync() }
     }

@@ -9,7 +9,7 @@ private const val KEY_TOKEN_TYPE = "KEY_TOKEN_TYPE"
 
 private const val KEY_STATE = "KEY_STATE"
 
-class AuthStorage(context: Context) {
+class LoginStorage(context: Context) {
 
     private val sharedPreferences by lazy {
         context.getSharedPreferences("auth", Context.MODE_PRIVATE)

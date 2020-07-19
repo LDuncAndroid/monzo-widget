@@ -6,30 +6,30 @@ import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import java.util.*
 
-class AuthenticationRepository(
+class LoginRepository(
     private val clientId: String,
     private val clientSecret: String,
     private val monzoApi: MonzoApi,
-    private val userStorage: AuthStorage
+    private val loginStorage: LoginStorage
 ) {
     val hasToken: Boolean
-        get() = userStorage.hasToken
+        get() = loginStorage.hasToken
 
     fun startLogin(): String {
-        return UUID.randomUUID().toString().also { userStorage.state = it }
+        return UUID.randomUUID().toString().also { loginStorage.state = it }
     }
 
     fun login(redirectUri: String, code: String, state: String): Maybe<Unit> {
         return Single.fromCallable {
-            if (state != userStorage.state) {
+            if (state != loginStorage.state) {
                 throw IllegalArgumentException("Cannot log in - state mismatch")
             }
         }
             .flatMapMaybe {
                 monzoApi.requestAccessToken(clientId, clientSecret, redirectUri, code)
                     .doOnSuccess { token ->
-                        userStorage.saveToken(token)
-                        userStorage.state = null
+                        loginStorage.saveToken(token)
+                        loginStorage.state = null
                     }
                     .map { }
                     .subscribeOn(Schedulers.io())
@@ -38,7 +38,7 @@ class AuthenticationRepository(
             }
             .doOnError {
                 // TODO: test state mismatch clears state
-                userStorage.state = null
+                loginStorage.state = null
             }
     }
 
