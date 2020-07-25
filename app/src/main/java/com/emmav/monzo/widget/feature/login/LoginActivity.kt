@@ -1,5 +1,6 @@
 package com.emmav.monzo.widget.feature.login
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -7,11 +8,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.emmav.monzo.widget.App
 import com.emmav.monzo.widget.R
-import com.emmav.monzo.widget.common.gone
-import com.emmav.monzo.widget.common.visible
+import com.emmav.monzo.widget.common.bindText
+import com.emmav.monzo.widget.common.setVisibility
 import com.emmav.monzo.widget.feature.home.HomeActivity
 import kotlinx.android.synthetic.main.activity_login.*
 
@@ -26,31 +26,20 @@ class LoginActivity : AppCompatActivity() {
         loginButton.setOnClickListener { viewModel.onLoginClicked() }
 
         viewModel.state.observe(this, Observer { state ->
+            loginProgressBar.setVisibility(visible = state.showLoading)
+            loginButton.setVisibility(visible = state.showLogin)
+            loginEmojiTextView.bindText(state.emoji)
+            loginTitleTextView.bindText(state.title)
+            loginSubtitleTextView.bindText(state.subtitle)
+
             when (state) {
-                is LoginViewModel.State.Unknown -> {
-                    // Show full screen loading
-                    loginProgressBar.visible()
-                }
-                is LoginViewModel.State.Unauthenticated -> {
-                    loginButton.visible()
-                }
                 is LoginViewModel.State.RequestMagicLink -> {
-                    instructionsTextView.text = getString(R.string.login_redirecting_body)
-                    loginButton.gone()
-                    redirectToRequestMagicLink(state.url)
-                }
-                is LoginViewModel.State.Authenticating -> {
-                    instructionsTextView.text = getString(R.string.login_logging_in_body)
-                }
-                is LoginViewModel.State.RequiresStrongCustomerAuthentication -> {
-                    loginButton.gone()
-                    loginProgressBar.visible()
-                    instructionsTextView.text = getString(R.string.login_sca_required)
+                    state.url?.let {
+                        redirectToRequestMagicLink(it)
+                        finish()
+                    }
                 }
                 is LoginViewModel.State.Authenticated -> {
-                    loginProgressBar.gone()
-                    loginButton.gone()
-                    instructionsTextView.text = getString(R.string.login_logged_in_body)
                     startActivity(HomeActivity.buildIntent(this))
                 }
             }
@@ -74,6 +63,12 @@ class LoginActivity : AppCompatActivity() {
                     it.getQueryParameter("state")!!
                 )
             }
+        }
+    }
+
+    companion object {
+        fun buildIntent(context: Context): Intent {
+            return Intent(context, LoginActivity::class.java)
         }
     }
 }

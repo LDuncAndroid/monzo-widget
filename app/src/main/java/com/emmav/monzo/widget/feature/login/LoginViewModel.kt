@@ -2,7 +2,11 @@ package com.emmav.monzo.widget.feature.login
 
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
+import com.emmav.monzo.widget.R
 import com.emmav.monzo.widget.common.BaseViewModel
+import com.emmav.monzo.widget.common.Text
+import com.emmav.monzo.widget.common.text
+import com.emmav.monzo.widget.common.textRes
 import com.emmav.monzo.widget.data.storage.LoginRepository
 import com.emmav.monzo.widget.feature.sync.SyncWorker
 import io.reactivex.Observable
@@ -10,18 +14,20 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import java.util.concurrent.TimeUnit
 
+private const val SECONDS_TO_REDIRECT = 5L
+
 class LoginViewModel(
     private val clientId: String,
     private val redirectUri: String,
     private val loginRepository: LoginRepository,
     private val workManager: WorkManager
-) : BaseViewModel<LoginViewModel.State>(initialState = State.Unknown) {
+) : BaseViewModel<LoginViewModel.State>(initialState = State.Unknown()) {
 
     init {
         if (loginRepository.hasToken) {
             setPreSCAAndSync()
         } else {
-            setState { State.Unauthenticated }
+            setState { State.Unauthenticated() }
         }
     }
 
@@ -29,7 +35,7 @@ class LoginViewModel(
      * We don't know if we're approved for SCA until we try to sync
      */
     private fun setPreSCAAndSync() {
-        setState { State.RequiresStrongCustomerAuthentication }
+        setState { State.RequiresStrongCustomerAuthentication() }
 
         // Check 2 seconds after invoked, then every 10
         disposables += Observable.interval(2, 10, TimeUnit.SECONDS)
@@ -39,56 +45,112 @@ class LoginViewModel(
             .ignoreElements()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                setState { State.Authenticated }
+                setState { State.Authenticated() }
                 workManager.enqueue(OneTimeWorkRequest.Builder(SyncWorker::class.java).build())
             }
     }
 
     fun onLoginClicked() {
-        setState {
-            State.RequestMagicLink(
-                url = "https://auth.monzo.com/?client_id=$clientId" +
-                        "&redirect_uri=$redirectUri" +
-                        "&response_type=code" +
-                        "&state=${loginRepository.startLogin()}"
-            )
-        }
+        disposables += Observable.interval(1, TimeUnit.SECONDS)
+            .take(SECONDS_TO_REDIRECT + 1)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                setState {
+                    val timeLeft = SECONDS_TO_REDIRECT - it.toInt()
+                    State.RequestMagicLink(
+                        title = textRes(R.string.login_redirecting_title, timeLeft),
+                        url = if (timeLeft <= 0) {
+                            "https://auth.monzo.com/?client_id=$clientId" +
+                                    "&redirect_uri=$redirectUri" +
+                                    "&response_type=code" +
+                                    "&state=${loginRepository.startLogin()}"
+                        } else null
+                    )
+                }
+            }
     }
 
     fun onMagicLinkParamsReceived(code: String, state: String) {
-        setState { State.Authenticating }
+        setState { State.Authenticating() }
         disposables += loginRepository.login(redirectUri, code, state)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { setPreSCAAndSync() }
     }
 
     sealed class State {
-        object Unknown : State()
-        object Unauthenticated : State()
+        abstract val showLoading: Boolean
+        abstract val showLogin: Boolean
+        abstract val emoji: Text
+        abstract val title: Text
+        abstract val subtitle: Text
+
+        data class Unknown(
+            override val showLoading: Boolean = true,
+            override val showLogin: Boolean = false,
+            override val emoji: Text = Text.Empty,
+            override val title: Text = Text.Empty,
+            override val subtitle: Text = Text.Empty
+        ) : State()
+
+        /**
+         * User is completely logged out.
+         */
+        data class Unauthenticated(
+            override val showLoading: Boolean = false,
+            override val showLogin: Boolean = true,
+            override val emoji: Text = text("👋🏿"),
+            override val title: Text = textRes(R.string.login_unauthed_title),
+            override val subtitle: Text = textRes(R.string.login_unauthed_subtitle)
+        ) : State()
 
         /**
          * Start of the OAuth flow to authenticate. The app will redirect the user to the [url], which will trigger
          * the sending of a magic link email. Clicking on this email will redirect back [redirectUri] and open
          * [LoginActivity]. We'll then update state to be [Authenticating].
          */
-        data class RequestMagicLink(val url: String) : State()
+        data class RequestMagicLink(
+            override val showLoading: Boolean = false,
+            override val showLogin: Boolean = false,
+            override val emoji: Text = text("⏩"),
+            override val title: Text = textRes(R.string.login_redirecting_title),
+            override val subtitle: Text = textRes(R.string.login_redirecting_subtitle),
+            val url: String?
+        ) : State()
 
         /**
          * We've been redirected back to the app, via the magic link the user clicked on.
          * Use the information from this link to login with and retrieve an access and refresh token.
          */
-        object Authenticating : State()
+        data class Authenticating(
+            override val showLoading: Boolean = true,
+            override val showLogin: Boolean = false,
+            override val emoji: Text = text("🤔"),
+            override val title: Text = textRes(R.string.login_logging_in_title),
+            override val subtitle: Text = textRes(R.string.login_logging_in_subtitle)
+        ) : State()
 
         /**
          * We've got an access token to authenticate our calls to the Monzo api with, but to access Accounts and
          * Balance information, we need to do a second step of authentication, called Strong Customer Authentication.
          * This can be thought about as 2FA.
          */
-        object RequiresStrongCustomerAuthentication : State()
+        data class RequiresStrongCustomerAuthentication(
+            override val showLoading: Boolean = false,
+            override val showLogin: Boolean = false,
+            override val emoji: Text = text("🔐"),
+            override val title: Text = textRes(R.string.login_requires_sca_title),
+            override val subtitle: Text = textRes(R.string.login_requires_sca_subtitle)
+        ) : State()
 
         /**
          * We made it! We can successfully sync our data with the Monzo api 🙌🏽.
          */
-        object Authenticated : State()
+        data class Authenticated(
+            override val showLoading: Boolean = false,
+            override val showLogin: Boolean = false,
+            override val emoji: Text = text("🎉"),
+            override val title: Text = textRes(R.string.login_logged_in_title),
+            override val subtitle: Text = textRes(R.string.login_logged_in_subtitle)
+        ) : State()
     }
 }
