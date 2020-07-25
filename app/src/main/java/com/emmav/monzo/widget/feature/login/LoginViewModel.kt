@@ -50,7 +50,7 @@ class LoginViewModel(
                 url = "https://auth.monzo.com/?client_id=$clientId" +
                         "&redirect_uri=$redirectUri" +
                         "&response_type=code" +
-                        "&state=" + loginRepository.startLogin()
+                        "&state=${loginRepository.startLogin()}"
             )
         }
     }
