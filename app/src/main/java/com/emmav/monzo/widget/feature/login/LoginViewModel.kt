@@ -147,7 +147,7 @@ class LoginViewModel(
          */
         data class Authenticated(
             override val showLoading: Boolean = false,
-            override val actionButton: Text = Text.Empty,
+            override val actionButton: Text = textRes(R.string.login_logged_in_action),
             override val emoji: Text = text("🎉"),
             override val title: Text = textRes(R.string.login_logged_in_title),
             override val subtitle: Text = textRes(R.string.login_logged_in_subtitle)

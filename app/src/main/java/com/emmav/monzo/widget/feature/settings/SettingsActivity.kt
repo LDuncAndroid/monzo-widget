@@ -82,7 +82,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         private fun Row.Account.bind(holder: ViewHolder) {
-            holder.containerView.widgetSettingsRowTextView.text = "💼 $type"
+            holder.containerView.widgetSettingsRowTextView.text = "💳 $type"
             holder.containerView.setOnClickListener { click.invoke(Unit) }
             showOrHideSelected(isSelected, holder)
         }

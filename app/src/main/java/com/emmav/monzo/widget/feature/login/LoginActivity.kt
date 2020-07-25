@@ -13,7 +13,6 @@ import com.emmav.monzo.widget.App
 import com.emmav.monzo.widget.R
 import com.emmav.monzo.widget.common.bindText
 import com.emmav.monzo.widget.common.setVisibility
-import com.emmav.monzo.widget.feature.home.HomeActivity
 import kotlinx.android.synthetic.main.activity_login.*
 
 class LoginActivity : AppCompatActivity() {
@@ -32,6 +31,8 @@ class LoginActivity : AppCompatActivity() {
                 } else {
                     Toast.makeText(this, R.string.login_requires_sca_monzo_not_installed, Toast.LENGTH_SHORT).show()
                 }
+            } else if (viewModel.state.value is LoginViewModel.State.Authenticated) {
+                finish()
             } else {
                 viewModel.onLoginClicked()
             }
@@ -44,15 +45,10 @@ class LoginActivity : AppCompatActivity() {
             loginTitleTextView.bindText(state.title)
             loginSubtitleTextView.bindText(state.subtitle)
 
-            when (state) {
-                is LoginViewModel.State.RequestMagicLink -> {
-                    state.url?.let {
-                        redirectToRequestMagicLink(it)
-                        finish()
-                    }
-                }
-                is LoginViewModel.State.Authenticated -> {
-                    startActivity(HomeActivity.buildIntent(this))
+            if (state is LoginViewModel.State.RequestMagicLink) {
+                state.url?.let {
+                    redirectToRequestMagicLink(it)
+                    finish()
                 }
             }
         })
