@@ -12,9 +12,9 @@
 
     <!-- Login -->
     <string name="login_activity_title">Monzo Widget</string>
-    <string name="login_action_title">Login</string>
     <string name="login_unauthed_title">Login with Monzo</string>
     <string name="login_unauthed_subtitle">Tap \'Login\' below to get started and we\'ll walk you through how to log in with your Monzo account.</string>
+    <string name="login_unauthed_action">Login</string>
     <string name="login_redirecting_title">Redirecting to browser in… %1$d</string>
     <string name="login_redirecting_subtitle">Please follow the instructions to send a magic link email, then open the email and click on \'Log in to Monzo\'.</string>
     <string name="login_logging_in_title">Logging you in…</string>
@@ -22,7 +22,9 @@
     <string name="login_logged_in_title">Successfully logged in</string>
     <string name="login_logged_in_subtitle">Drag a widget to your homescreen and enjoy!</string>
     <string name="login_requires_sca_title">Approve in Monzo app</string>
-    <string name="login_requires_sca_subtitle">To access your account and balance information we need to re-permit access every 90 days. Please go to your Monzo app to approve this widget.</string>
+    <string name="login_requires_sca_subtitle">To finish setup, we need to grant access to your accounts and balance information every 90 days. Please go to your Monzo app to approve this widget.</string>
+    <string name="login_requires_sca_action">Open Monzo app</string>
+    <string name="login_requires_sca_monzo_not_installed">Monzo app not installed!</string>
 
     <!-- Settings -->
     <string name="settings_activity_title">Widget Settings</string>

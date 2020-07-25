@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContextCompat
@@ -23,11 +24,22 @@ class LoginActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_login)
 
-        loginButton.setOnClickListener { viewModel.onLoginClicked() }
+        loginActionButton.setOnClickListener {
+            if (viewModel.state.value is LoginViewModel.State.RequiresStrongCustomerAuthentication) {
+                val monzoAppIntent = packageManager.getLaunchIntentForPackage("co.uk.getmondo")
+                if (monzoAppIntent != null) {
+                    startActivity(monzoAppIntent)
+                } else {
+                    Toast.makeText(this, R.string.login_requires_sca_monzo_not_installed, Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                viewModel.onLoginClicked()
+            }
+        }
 
         viewModel.state.observe(this, Observer { state ->
             loginProgressBar.setVisibility(visible = state.showLoading)
-            loginButton.setVisibility(visible = state.showLogin)
+            loginActionButton.bindText(state.actionButton)
             loginEmojiTextView.bindText(state.emoji)
             loginTitleTextView.bindText(state.title)
             loginSubtitleTextView.bindText(state.subtitle)

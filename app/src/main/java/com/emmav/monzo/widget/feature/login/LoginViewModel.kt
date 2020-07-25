@@ -79,14 +79,14 @@ class LoginViewModel(
 
     sealed class State {
         abstract val showLoading: Boolean
-        abstract val showLogin: Boolean
+        abstract val actionButton: Text
         abstract val emoji: Text
         abstract val title: Text
         abstract val subtitle: Text
 
         data class Unknown(
             override val showLoading: Boolean = true,
-            override val showLogin: Boolean = false,
+            override val actionButton: Text = Text.Empty,
             override val emoji: Text = Text.Empty,
             override val title: Text = Text.Empty,
             override val subtitle: Text = Text.Empty
@@ -97,7 +97,7 @@ class LoginViewModel(
          */
         data class Unauthenticated(
             override val showLoading: Boolean = false,
-            override val showLogin: Boolean = true,
+            override val actionButton: Text = textRes(R.string.login_unauthed_action),
             override val emoji: Text = text("👋🏿"),
             override val title: Text = textRes(R.string.login_unauthed_title),
             override val subtitle: Text = textRes(R.string.login_unauthed_subtitle)
@@ -110,7 +110,7 @@ class LoginViewModel(
          */
         data class RequestMagicLink(
             override val showLoading: Boolean = false,
-            override val showLogin: Boolean = false,
+            override val actionButton: Text = Text.Empty,
             override val emoji: Text = text("⏩"),
             override val title: Text = textRes(R.string.login_redirecting_title),
             override val subtitle: Text = textRes(R.string.login_redirecting_subtitle),
@@ -123,8 +123,8 @@ class LoginViewModel(
          */
         data class Authenticating(
             override val showLoading: Boolean = true,
-            override val showLogin: Boolean = false,
-            override val emoji: Text = text("🤔"),
+            override val actionButton: Text = Text.Empty,
+            override val emoji: Text = Text.Empty,
             override val title: Text = textRes(R.string.login_logging_in_title),
             override val subtitle: Text = textRes(R.string.login_logging_in_subtitle)
         ) : State()
@@ -136,7 +136,7 @@ class LoginViewModel(
          */
         data class RequiresStrongCustomerAuthentication(
             override val showLoading: Boolean = false,
-            override val showLogin: Boolean = false,
+            override val actionButton: Text = textRes(R.string.login_requires_sca_action),
             override val emoji: Text = text("🔐"),
             override val title: Text = textRes(R.string.login_requires_sca_title),
             override val subtitle: Text = textRes(R.string.login_requires_sca_subtitle)
@@ -147,7 +147,7 @@ class LoginViewModel(
          */
         data class Authenticated(
             override val showLoading: Boolean = false,
-            override val showLogin: Boolean = false,
+            override val actionButton: Text = Text.Empty,
             override val emoji: Text = text("🎉"),
             override val title: Text = textRes(R.string.login_logged_in_title),
             override val subtitle: Text = textRes(R.string.login_logged_in_subtitle)
