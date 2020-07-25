@@ -75,9 +75,15 @@ class LoginViewModel(
 
         /**
          * We've been redirected back to the app, via the magic link the user clicked on.
-         * Use the information from this link to login with.
+         * Use the information from this link to login with and retrieve an access and refresh token.
          */
         object Authenticating : State()
+
+        /**
+         * We've got an access token to authenticate our calls to the Monzo api with, but to access Accounts and
+         * Balance information, we need to do a second step of authentication, called Strong Customer Authentication.
+         * This can be thought about as 2FA.
+         */
         object RequiresStrongCustomerAuthentication : State()
 
         /**
