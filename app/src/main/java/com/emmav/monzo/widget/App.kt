@@ -39,7 +39,7 @@ class App : Application() {
     val monzoRepository by lazy { MonzoRepository(monzoApi = apiModule.monzoApi, monzoStorage = database) }
     val widgetRepository by lazy { WidgetRepository(monzoStorage = database) }
 
-    val splashModule by lazy { SplashModule(clientRepository = clientRepository) }
+    val splashModule by lazy { SplashModule(clientRepository = clientRepository, loginRepository = loginRepository) }
     val setupClientModule by lazy { SetupClientModule(clientRepository = clientRepository, redirectUri = redirectUri) }
     val loginModule by lazy {
         LoginModule(context = this, loginRepository = loginRepository, redirectUri = redirectUri)

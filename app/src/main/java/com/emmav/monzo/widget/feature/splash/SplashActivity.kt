@@ -6,8 +6,10 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.emmav.monzo.widget.App
+import com.emmav.monzo.widget.feature.home.HomeActivity
 import com.emmav.monzo.widget.feature.login.LoginActivity
 import com.emmav.monzo.widget.feature.setupclient.SetupClientActivity
+import com.emmav.monzo.widget.feature.splash.SplashViewModel.AppState
 
 class SplashActivity : AppCompatActivity() {
 
@@ -19,9 +21,10 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         viewModel.state.observe(this, Observer {
-            when (it) {
-                SplashViewModel.State.RequiresClientIdAndSecret -> startActivity(SetupClientActivity.buildIntent(this))
-                SplashViewModel.State.HasClientIdAndSecret -> startActivity(LoginActivity.buildIntent(this))
+            when (it.appState) {
+                AppState.REQUIRES_CLIENT -> startActivity(SetupClientActivity.buildIntent(this))
+                AppState.REQUIRES_TOKEN -> startActivity(LoginActivity.buildIntent(this))
+                AppState.AUTHENTICATED -> startActivity(HomeActivity.buildIntent(this))
             }
         })
     }

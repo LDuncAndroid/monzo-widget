@@ -2,6 +2,8 @@
 
 An Android app widget for your homescreen, showing the balance of your accounts or Pots.
 
+<img src="images/preview.png" width="30%" />
+
 ## Configure Monzo client
 
 | Landing page | Instructions | Enter client id & secret |

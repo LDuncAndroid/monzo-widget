@@ -86,7 +86,7 @@ class WidgetProvider : AppWidgetProvider() {
                             context = context,
                             pendingIntent = PendingIntent.getActivity(context, widgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT),
                             amount = spannableString,
-                            subtitle = it.type.toShortAccountType(),
+                            subtitle = "💳 ${it.type.toShortAccountType()}",
                             appWidgetManager = appWidgetManager,
                             appWidgetId = widgetId
                         )
@@ -97,7 +97,7 @@ class WidgetProvider : AppWidgetProvider() {
                             context = context,
                             pendingIntent = PendingIntent.getActivity(context, widgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT),
                             amount = spannableString,
-                            subtitle = it.name,
+                            subtitle = "🍯 ${it.name}",
                             appWidgetManager = appWidgetManager,
                             appWidgetId = widgetId
                         )
