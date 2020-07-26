@@ -39,6 +39,7 @@ class SetupClientActivity : AppCompatActivity(), TextWatcher {
                 clientSecret = setupClientSecretEditText.text.toString()
             )
             startActivity(LoginActivity.buildIntent(this))
+            finish()
         }
 
         setupClientIdEditText.addTextChangedListener(this)
