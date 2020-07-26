@@ -12,8 +12,8 @@ An Android app widget for your homescreen, showing the balance of your accounts 
 
 | Login page | Redirect to Monzo | Request magic link email | Open magic link |
 |---|---|---|---|
-| ![step1](images/step1-login.png) | ![step2](images/step2-redirect.png) | ![step3](images/step3-reqmagiclink.png) | ![step4](images/step4-openmagiclink.png) |
+| ![step1](images/login1.png) | ![step2](images/login2.png) | ![step3](images/login3.png) | ![step4](images/login4.png) |
 
 | Log in | 2FA | Done! |
 |---|---|---|
-| ![step5](images/step5-auth.png) | ![step6](images/step6-sca.png) | ![step7](images/step7-done.png) |
+| ![step1](images/login5.png) | ![step2](images/login6.png) | ![step3](images/login7.png) |

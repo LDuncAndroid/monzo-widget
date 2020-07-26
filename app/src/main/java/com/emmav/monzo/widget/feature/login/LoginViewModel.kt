@@ -123,7 +123,7 @@ class LoginViewModel(
         data class Authenticating(
             override val showLoading: Boolean = true,
             override val actionButton: Text = Text.Empty,
-            override val emoji: Text = Text.Empty,
+            override val emoji: Text = text("🔒"),
             override val title: Text = textRes(R.string.login_logging_in_title),
             override val subtitle: Text = textRes(R.string.login_logging_in_subtitle)
         ) : State()
@@ -134,7 +134,7 @@ class LoginViewModel(
          * This can be thought about as 2FA.
          */
         data class RequiresStrongCustomerAuthentication(
-            override val showLoading: Boolean = false,
+            override val showLoading: Boolean = true,
             override val actionButton: Text = textRes(R.string.login_requires_sca_action),
             override val emoji: Text = text("🔐"),
             override val title: Text = textRes(R.string.login_requires_sca_title),

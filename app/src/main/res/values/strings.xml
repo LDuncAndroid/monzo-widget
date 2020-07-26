@@ -13,7 +13,7 @@
     <string name="setup_activity_title">Configure Client</string>
     <string name="setup_welcome_title">Let\'s get setup!</string>
     <string name="setup_welcome_subtitle">Have you already created a confidential Monzo client?</string>
-    <string name="setup_welcome_action_positive">Yes, I do!</string>
+    <string name="setup_welcome_action_positive">Yes, I have!</string>
     <string name="setup_welcome_action_negative">I don\'t think so?</string>
     <string name="setup_info_title">Create a new client app</string>
     <string name="setup_info_subtitle">Log in with the Monzo Developer Portal, create a confidential client, and set the redirect uri to https://monzowidget</string>
