@@ -1,5 +1,7 @@
 package com.emmav.monzo.widget.feature.splash
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -22,5 +24,11 @@ class SplashActivity : AppCompatActivity() {
                 SplashViewModel.State.HasClientIdAndSecret -> startActivity(LoginActivity.buildIntent(this))
             }
         })
+    }
+
+    companion object {
+        fun buildIntent(context: Context): Intent {
+            return Intent(context, SplashActivity::class.java)
+        }
     }
 }

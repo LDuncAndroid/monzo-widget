@@ -45,7 +45,7 @@ class App : Application() {
         LoginModule(context = this, loginRepository = loginRepository, redirectUri = redirectUri)
     }
     val homeModule by lazy { HomeModule(widgetRepository = widgetRepository) }
-    val settingsModule by lazy { SettingsModule(monzoRepository = monzoRepository) }
+    val settingsModule by lazy { SettingsModule(monzoRepository = monzoRepository, loginRepository = loginRepository) }
 
     private val redirectUri by lazy {
         getString(R.string.callback_url_scheme) + "://" + getString(R.string.callback_url_host)

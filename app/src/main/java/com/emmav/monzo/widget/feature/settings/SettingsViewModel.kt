@@ -3,6 +3,7 @@ package com.emmav.monzo.widget.feature.settings
 import com.emmav.monzo.widget.common.BaseViewModel
 import com.emmav.monzo.widget.common.Item
 import com.emmav.monzo.widget.data.api.toLongAccountType
+import com.emmav.monzo.widget.data.auth.LoginRepository
 import com.emmav.monzo.widget.data.db.MonzoRepository
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -12,6 +13,7 @@ import io.reactivex.rxkotlin.plusAssign
 class SettingsViewModel(
     private val appWidgetId: Int,
     private val widgetTypeId: String?,
+    private val loginRepository: LoginRepository,
     private val monzoRepository: MonzoRepository
 ) : BaseViewModel<SettingsViewModel.State>(initialState = State()) {
 
@@ -45,9 +47,14 @@ class SettingsViewModel(
         .refCount()
 
     init {
+        if (!loginRepository.hasToken) {
+            setState { copy(error = true) }
+        }
+
         disposables += Observable.combineLatest(
             accountsObservable,
-            potsObservable, BiFunction<List<Row>, List<Row>, List<Row>> { accounts, pots ->
+            potsObservable,
+            BiFunction<List<Row>, List<Row>, List<Row>> { accounts, pots ->
                 accounts + pots
             })
             .observeOn(AndroidSchedulers.mainThread())
@@ -66,7 +73,12 @@ class SettingsViewModel(
             .subscribe { setState { copy(complete = true) } }
     }
 
-    data class State(val loading: Boolean = true, val rows: List<Row> = emptyList(), val complete: Boolean = false)
+    data class State(
+        val loading: Boolean = true,
+        val rows: List<Row> = emptyList(),
+        val complete: Boolean = false,
+        val error: Boolean = false
+    )
 }
 
 sealed class Row : Item {

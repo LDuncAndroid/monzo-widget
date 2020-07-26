@@ -15,6 +15,7 @@ import com.emmav.monzo.widget.common.gone
 import com.emmav.monzo.widget.common.visible
 import com.emmav.monzo.widget.feature.appwidget.EXTRA_WIDGET_TYPE_ID
 import com.emmav.monzo.widget.feature.appwidget.WidgetProvider
+import com.emmav.monzo.widget.feature.splash.SplashActivity
 import kotlinx.android.synthetic.main.activity_settings.*
 import kotlinx.android.synthetic.main.item_widget_settings_header.view.*
 import kotlinx.android.synthetic.main.item_widget_settings_row.view.*
@@ -46,6 +47,11 @@ class SettingsActivity : AppCompatActivity() {
 
         viewModel.state.observe(this, Observer { state ->
             rowsAdapter.submitList(state.rows)
+
+            if(state.error) {
+                startActivity(SplashActivity.buildIntent(this))
+                finish()
+            }
 
             if (state.complete) {
                 finishWidgetSetup()
