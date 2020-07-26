@@ -1,6 +1,6 @@
 package com.emmav.monzo.widget.feature.home
 
-import com.emmav.monzo.widget.data.storage.WidgetRepository
+import com.emmav.monzo.widget.data.appwidget.WidgetRepository
 
 class HomeModule(
     private val widgetRepository: WidgetRepository

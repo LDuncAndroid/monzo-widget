@@ -3,7 +3,7 @@ package com.emmav.monzo.widget.feature.settings
 import com.emmav.monzo.widget.common.BaseViewModel
 import com.emmav.monzo.widget.common.Item
 import com.emmav.monzo.widget.data.api.toLongAccountType
-import com.emmav.monzo.widget.data.storage.MonzoRepository
+import com.emmav.monzo.widget.data.db.MonzoRepository
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.BiFunction

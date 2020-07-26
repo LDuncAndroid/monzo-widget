@@ -19,7 +19,7 @@ import com.emmav.monzo.widget.R
 import com.emmav.monzo.widget.common.TypefaceSpan
 import com.emmav.monzo.widget.common.toPx
 import com.emmav.monzo.widget.data.api.toShortAccountType
-import com.emmav.monzo.widget.data.storage.Widget
+import com.emmav.monzo.widget.data.appwidget.Widget
 import com.emmav.monzo.widget.feature.settings.SettingsActivity
 import java.math.BigDecimal
 import java.text.NumberFormat

@@ -1,8 +1,8 @@
 package com.emmav.monzo.widget.data.api
 
-import com.emmav.monzo.widget.data.storage.DbAccount
-import com.emmav.monzo.widget.data.storage.DbBalance
-import com.emmav.monzo.widget.data.storage.DbPot
+import com.emmav.monzo.widget.data.db.DbAccount
+import com.emmav.monzo.widget.data.db.DbBalance
+import com.emmav.monzo.widget.data.db.DbPot
 
 internal fun ApiAccount.toDbAccount(): DbAccount {
     return DbAccount(id = id, type = type)

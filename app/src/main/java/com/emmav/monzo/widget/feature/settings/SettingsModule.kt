@@ -1,6 +1,6 @@
 package com.emmav.monzo.widget.feature.settings
 
-import com.emmav.monzo.widget.data.storage.MonzoRepository
+import com.emmav.monzo.widget.data.db.MonzoRepository
 
 class SettingsModule(private val monzoRepository: MonzoRepository) {
 

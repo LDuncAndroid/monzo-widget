@@ -4,58 +4,52 @@ import android.app.Application
 import android.content.Context
 import androidx.room.Room
 import com.emmav.monzo.widget.data.api.ApiModule
-import com.emmav.monzo.widget.data.storage.*
+import com.emmav.monzo.widget.data.appwidget.WidgetRepository
+import com.emmav.monzo.widget.data.auth.ClientRepository
+import com.emmav.monzo.widget.data.auth.ClientStorage
+import com.emmav.monzo.widget.data.auth.LoginRepository
+import com.emmav.monzo.widget.data.auth.LoginStorage
+import com.emmav.monzo.widget.data.db.AppDatabase
+import com.emmav.monzo.widget.data.db.MonzoRepository
 import com.emmav.monzo.widget.feature.home.HomeModule
 import com.emmav.monzo.widget.feature.login.LoginModule
 import com.emmav.monzo.widget.feature.settings.SettingsModule
+import com.emmav.monzo.widget.feature.setupclient.SetupClientModule
+import com.emmav.monzo.widget.feature.splash.SplashModule
 import timber.log.Timber
 
 class App : Application() {
-    private val clientId = BuildConfig.CLIENT_ID
-    private val clientSecret = BuildConfig.CLIENT_SECRET
-
     private val loginStorage by lazy { LoginStorage(this) }
+    private val clientStorage by lazy { ClientStorage(this) }
     private val database by lazy {
-        Room.databaseBuilder(this, Database::class.java, "db")
+        Room.databaseBuilder(this, AppDatabase::class.java, "db")
             .fallbackToDestructiveMigration()
             .build()
+            .storage()
     }
 
     private val apiModule by lazy {
-        ApiModule(
-            clientId = clientId,
-            clientSecret = clientSecret,
-            context = this,
-            loginStorage = loginStorage
-        )
+        ApiModule(context = this, loginStorage = loginStorage, clientStorage = clientStorage)
     }
+    private val clientRepository by lazy { ClientRepository(clientStorage = clientStorage) }
     private val loginRepository by lazy {
-        LoginRepository(
-            clientId = clientId,
-            clientSecret = clientSecret,
-            monzoApi = apiModule.monzoApi,
-            loginStorage = loginStorage
-        )
+        LoginRepository(monzoApi = apiModule.monzoApi, loginStorage = loginStorage, clientStorage = clientStorage)
     }
 
-    val monzoRepository by lazy {
-        MonzoRepository(
-            monzoApi = apiModule.monzoApi,
-            storage = database.storage()
-        )
-    }
+    val monzoRepository by lazy { MonzoRepository(monzoApi = apiModule.monzoApi, monzoStorage = database) }
+    val widgetRepository by lazy { WidgetRepository(monzoStorage = database) }
 
-    val widgetRepository by lazy { WidgetRepository(storage = database.storage()) }
-
+    val splashModule by lazy { SplashModule(clientRepository = clientRepository) }
+    val setupClientModule by lazy { SetupClientModule(clientRepository = clientRepository, redirectUri = redirectUri) }
     val loginModule by lazy {
-        LoginModule(
-            context = this,
-            clientId = clientId,
-            loginRepository = loginRepository
-        )
+        LoginModule(context = this, loginRepository = loginRepository, redirectUri = redirectUri)
     }
-    val settingsModule by lazy { SettingsModule(monzoRepository = monzoRepository) }
     val homeModule by lazy { HomeModule(widgetRepository = widgetRepository) }
+    val settingsModule by lazy { SettingsModule(monzoRepository = monzoRepository) }
+
+    private val redirectUri by lazy {
+        getString(R.string.callback_url_scheme) + "://" + getString(R.string.callback_url_host)
+    }
 
     override fun onCreate() {
         super.onCreate()

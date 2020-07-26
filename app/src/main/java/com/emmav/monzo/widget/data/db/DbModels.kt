@@ -1,4 +1,4 @@
-package com.emmav.monzo.widget.data.storage
+package com.emmav.monzo.widget.data.db
 
 import androidx.room.Embedded
 import androidx.room.Entity

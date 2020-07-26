@@ -13,9 +13,6 @@ android {
         versionName "0.1"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
-        buildConfigField "String", "CLIENT_ID", "\"${clientId}\""
-        buildConfigField "String", "CLIENT_SECRET", "\"${clientSecret}\""
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

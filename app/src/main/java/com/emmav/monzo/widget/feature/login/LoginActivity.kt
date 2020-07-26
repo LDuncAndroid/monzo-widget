@@ -2,16 +2,14 @@ package com.emmav.monzo.widget.feature.login
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.browser.customtabs.CustomTabsIntent
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.emmav.monzo.widget.App
 import com.emmav.monzo.widget.R
 import com.emmav.monzo.widget.common.bindText
+import com.emmav.monzo.widget.common.openUrl
 import com.emmav.monzo.widget.common.setVisibility
 import kotlinx.android.synthetic.main.activity_login.*
 
@@ -47,18 +45,11 @@ class LoginActivity : AppCompatActivity() {
 
             if (state is LoginViewModel.State.RequestMagicLink) {
                 state.url?.let {
-                    redirectToRequestMagicLink(it)
+                    openUrl(it)
                     finish()
                 }
             }
         })
-    }
-
-    private fun redirectToRequestMagicLink(url: String) {
-        CustomTabsIntent.Builder()
-            .setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary))
-            .build()
-            .launchUrl(this, Uri.parse(url))
     }
 
     override fun onNewIntent(intent: Intent?) {

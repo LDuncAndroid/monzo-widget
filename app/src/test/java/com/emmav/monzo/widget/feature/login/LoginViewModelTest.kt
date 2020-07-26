@@ -3,7 +3,7 @@ package com.emmav.monzo.widget.feature.login
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.work.WorkManager
 import com.emmav.monzo.RxSchedulerRule
-import com.emmav.monzo.widget.data.storage.LoginRepository
+import com.emmav.monzo.widget.data.auth.LoginRepository
 import com.nhaarman.mockitokotlin2.mock
 import io.reactivex.Single
 import org.junit.Rule

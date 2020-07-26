@@ -1,6 +1,7 @@
-package com.emmav.monzo.widget.data.storage
+package com.emmav.monzo.widget.data.db
 
 import com.emmav.monzo.widget.data.api.*
+import com.emmav.monzo.widget.data.appwidget.WidgetType
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -8,20 +9,20 @@ import io.reactivex.schedulers.Schedulers
 
 class MonzoRepository(
     private val monzoApi: MonzoApi,
-    private val storage: Storage
+    private val monzoStorage: MonzoStorage
 ) {
     fun syncAccounts(): Single<List<ApiAccount>> {
         return monzoApi.accounts()
             .map { it.accounts }
             .doOnSuccess {
-                storage.saveAccounts(it.map { apiAccount -> apiAccount.toDbAccount() })
+                monzoStorage.saveAccounts(it.map { apiAccount -> apiAccount.toDbAccount() })
             }
             .subscribeOn(Schedulers.io())
     }
 
     fun syncBalance(accountId: String): Completable {
         return monzoApi.balance(accountId = accountId)
-            .doOnSuccess { storage.saveBalance(it.toDbBalance(accountId = accountId)) }
+            .doOnSuccess { monzoStorage.saveBalance(it.toDbBalance(accountId = accountId)) }
             .ignoreElement()
             .subscribeOn(Schedulers.io())
     }
@@ -32,7 +33,7 @@ class MonzoRepository(
                 val pots = it.pots
                     .filter { apiPot -> !apiPot.deleted }
                     .map { apiPot -> apiPot.toDbPot(accountId = accountId) }
-                storage.savePots(pots)
+                monzoStorage.savePots(pots)
             }
             .ignoreElement()
             .subscribeOn(Schedulers.io())
@@ -41,7 +42,7 @@ class MonzoRepository(
     fun saveAccountWidget(accountId: String, id: Int): Completable {
         return Single.fromCallable {
             val dbWidget = DbWidget(id = id, type = WidgetType.ACCOUNT_BALANCE.key, accountId = accountId, potId = null)
-            storage.saveWidget(dbWidget)
+            monzoStorage.saveWidget(dbWidget)
         }
             .ignoreElement()
             .subscribeOn(Schedulers.io())
@@ -50,19 +51,19 @@ class MonzoRepository(
     fun savePotWidget(potId: String, id: Int): Completable {
         return Single.fromCallable {
             val dbWidget = DbWidget(id = id, type = WidgetType.POT_BALANCE.key, accountId = null, potId = potId)
-            storage.saveWidget(dbWidget)
+            monzoStorage.saveWidget(dbWidget)
         }
             .ignoreElement()
             .subscribeOn(Schedulers.io())
     }
 
     fun accountsWithBalance(): Observable<List<DbAccountWithBalance>> {
-        return storage.accountsWithBalance()
+        return monzoStorage.accountsWithBalance()
             .subscribeOn(Schedulers.io())
     }
 
     fun pots(): Observable<List<DbPot>> {
-        return storage.pots()
+        return monzoStorage.pots()
             .subscribeOn(Schedulers.io())
     }
 }

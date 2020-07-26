@@ -1,4 +1,4 @@
-package com.emmav.monzo.widget.data.storage
+package com.emmav.monzo.widget.data.auth
 
 import android.content.Context
 import com.emmav.monzo.widget.data.api.ApiToken
@@ -6,7 +6,6 @@ import com.emmav.monzo.widget.data.api.ApiToken
 private const val KEY_REFRESH_TOKEN = "KEY_REFRESH_TOKEN"
 private const val KEY_ACCESS_TOKEN = "KEY_ACCESS_TOKEN"
 private const val KEY_TOKEN_TYPE = "KEY_TOKEN_TYPE"
-
 private const val KEY_STATE = "KEY_STATE"
 
 class LoginStorage(context: Context) {
@@ -21,12 +20,12 @@ class LoginStorage(context: Context) {
             sharedPreferences.edit().putString(KEY_STATE, state).apply()
         }
 
-    fun saveToken(token: ApiToken) {
+    fun saveToken(apiToken: ApiToken) {
         sharedPreferences
             .edit()
-            .putString(KEY_REFRESH_TOKEN, token.refreshToken)
-            .putString(KEY_ACCESS_TOKEN, token.accessToken)
-            .putString(KEY_TOKEN_TYPE, token.tokenType)
+            .putString(KEY_REFRESH_TOKEN, apiToken.refreshToken)
+            .putString(KEY_ACCESS_TOKEN, apiToken.accessToken)
+            .putString(KEY_TOKEN_TYPE, apiToken.tokenType)
             .apply()
     }
 

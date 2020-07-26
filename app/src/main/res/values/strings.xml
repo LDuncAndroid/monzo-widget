@@ -5,10 +5,23 @@
 
     <!-- App strings -->
     <string name="app_name">Monzo Widget</string>
+
+    <!-- Splash -->
     <string name="splash_activity_title">@string/app_name</string>
 
-    <!-- Home -->
-    <string name="home_activity_title">Current widgets</string>
+    <!-- Setup Client -->
+    <string name="setup_activity_title">Configure Client</string>
+    <string name="setup_welcome_title">Let\'s get setup!</string>
+    <string name="setup_welcome_subtitle">Have you already created a confidential Monzo client?</string>
+    <string name="setup_welcome_action_positive">Yes, I do!</string>
+    <string name="setup_welcome_action_negative">I don\'t think so?</string>
+    <string name="setup_info_title">Create a new client app</string>
+    <string name="setup_info_subtitle">Log in with the Monzo Developer Portal, create a confidential client, and set the redirect uri to https://monzowidget</string>
+    <string name="setup_info_action">Go to Monzo Developer Portal</string>
+    <string name="setup_enter_client_details_title">Enter client details</string>
+    <string name="setup_enter_client_id_hint">client id</string>
+    <string name="setup_enter_client_secret_hint">client secret</string>
+    <string name="setup_entered_client_details">Done</string>
 
     <!-- Login -->
     <string name="login_activity_title">Monzo Widget</string>
@@ -26,6 +39,9 @@
     <string name="login_logged_in_title">Successfully logged in</string>
     <string name="login_logged_in_subtitle">You can now create widgets to see your 💳 Account or 🍯 Pot balances. Go to your phone\'s launcher to make your first widget.</string>
     <string name="login_logged_in_action">Close</string>
+
+    <!-- Home -->
+    <string name="home_activity_title">Current widgets</string>
 
     <!-- Settings -->
     <string name="settings_activity_title">Widget Settings</string>

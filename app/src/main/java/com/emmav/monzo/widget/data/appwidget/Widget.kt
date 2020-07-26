@@ -1,4 +1,4 @@
-package com.emmav.monzo.widget.data.storage
+package com.emmav.monzo.widget.data.appwidget
 
 sealed class Widget {
     abstract val id: String

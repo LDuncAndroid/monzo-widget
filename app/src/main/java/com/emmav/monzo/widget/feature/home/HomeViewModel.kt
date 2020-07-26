@@ -3,8 +3,8 @@ package com.emmav.monzo.widget.feature.home
 import com.emmav.monzo.widget.common.BaseViewModel
 import com.emmav.monzo.widget.common.Item
 import com.emmav.monzo.widget.data.api.toLongAccountType
-import com.emmav.monzo.widget.data.storage.Widget
-import com.emmav.monzo.widget.data.storage.WidgetRepository
+import com.emmav.monzo.widget.data.appwidget.Widget
+import com.emmav.monzo.widget.data.appwidget.WidgetRepository
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 

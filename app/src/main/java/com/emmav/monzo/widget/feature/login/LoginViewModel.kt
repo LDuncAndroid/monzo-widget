@@ -7,7 +7,7 @@ import com.emmav.monzo.widget.common.BaseViewModel
 import com.emmav.monzo.widget.common.Text
 import com.emmav.monzo.widget.common.text
 import com.emmav.monzo.widget.common.textRes
-import com.emmav.monzo.widget.data.storage.LoginRepository
+import com.emmav.monzo.widget.data.auth.LoginRepository
 import com.emmav.monzo.widget.feature.sync.SyncWorker
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -17,9 +17,8 @@ import java.util.concurrent.TimeUnit
 private const val SECONDS_TO_REDIRECT = 5L
 
 class LoginViewModel(
-    private val clientId: String,
-    private val redirectUri: String,
     private val loginRepository: LoginRepository,
+    private val redirectUri: String,
     private val workManager: WorkManager
 ) : BaseViewModel<LoginViewModel.State>(initialState = State.Unknown()) {
 
@@ -60,8 +59,8 @@ class LoginViewModel(
                     State.RequestMagicLink(
                         title = textRes(R.string.login_redirecting_title, timeLeft),
                         url = if (timeLeft <= 0) {
-                            "https://auth.monzo.com/?client_id=$clientId" +
-                                    "&redirect_uri=$redirectUri" +
+                            "https://auth.monzo.com/?client_id=${loginRepository.clientId}" +
+                                    "&redirect_uri=${redirectUri}" +
                                     "&response_type=code" +
                                     "&state=${loginRepository.startLogin()}"
                         } else null

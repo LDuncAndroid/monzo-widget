@@ -1,11 +1,11 @@
-package com.emmav.monzo.widget.data.storage
+package com.emmav.monzo.widget.data.db
 
 import androidx.room.*
 import io.reactivex.Observable
 import io.reactivex.Single
 
 @Dao
-interface Storage {
+interface MonzoStorage {
 
     @Transaction
     @Query("SELECT * FROM accounts")

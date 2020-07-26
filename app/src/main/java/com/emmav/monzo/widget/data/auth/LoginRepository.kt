@@ -1,4 +1,4 @@
-package com.emmav.monzo.widget.data.storage
+package com.emmav.monzo.widget.data.auth
 
 import com.emmav.monzo.widget.data.api.MonzoApi
 import io.reactivex.Maybe
@@ -7,13 +7,15 @@ import io.reactivex.schedulers.Schedulers
 import java.util.*
 
 class LoginRepository(
-    private val clientId: String,
-    private val clientSecret: String,
     private val monzoApi: MonzoApi,
-    private val loginStorage: LoginStorage
+    private val loginStorage: LoginStorage,
+    private val clientStorage: ClientStorage
 ) {
     val hasToken: Boolean
         get() = loginStorage.hasToken
+
+    val clientId: String?
+        get() = clientStorage.clientId
 
     fun startLogin(): String {
         return UUID.randomUUID().toString().also { loginStorage.state = it }
@@ -26,7 +28,7 @@ class LoginRepository(
             }
         }
             .flatMapMaybe {
-                monzoApi.requestAccessToken(clientId, clientSecret, redirectUri, code)
+                monzoApi.requestAccessToken(clientId!!, clientStorage.clientSecret!!, redirectUri, code)
                     .doOnSuccess { token ->
                         loginStorage.saveToken(token)
                         loginStorage.state = null

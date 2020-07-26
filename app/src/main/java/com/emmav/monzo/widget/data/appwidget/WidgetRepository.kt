@@ -1,28 +1,30 @@
-package com.emmav.monzo.widget.data.storage
+package com.emmav.monzo.widget.data.appwidget
 
+import com.emmav.monzo.widget.data.db.DbWidgetWithRelations
+import com.emmav.monzo.widget.data.db.MonzoStorage
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 
-class WidgetRepository(private val storage: Storage) {
+class WidgetRepository(private val monzoStorage: MonzoStorage) {
 
     fun widgetById(id: Int): Maybe<Widget> {
-        return storage.widgetById(id = id)
+        return monzoStorage.widgetById(id = id)
             .filter { it.isNotEmpty() }
             .map { dbWidgets -> dbWidgets.map { it.toWidget() }.first() }
             .subscribeOn(Schedulers.io())
     }
 
     fun allWidgets(): Observable<List<Widget>> {
-        return storage.widgets()
+        return monzoStorage.widgets()
             .map { dbWidgets -> dbWidgets.map { it.toWidget() } }
             .subscribeOn(Schedulers.io())
     }
 
     fun deleteRemovedWidgets(widgetIds: List<Int>): Completable {
         return Completable.fromCallable {
-            storage.deleteAllWidgetsExcept(widgetIds = widgetIds)
+            monzoStorage.deleteAllWidgetsExcept(widgetIds = widgetIds)
         }.subscribeOn(Schedulers.io())
     }
 }

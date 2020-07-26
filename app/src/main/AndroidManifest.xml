@@ -15,7 +15,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".feature.SplashActivity"
+            android:name=".feature.splash.SplashActivity"
             android:label="@string/splash_activity_title"
             android:noHistory="true">
             <intent-filter>
@@ -24,6 +24,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".feature.setupclient.SetupClientActivity"
+            android:label="@string/setup_activity_title"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
         <activity
             android:name=".feature.login.LoginActivity"
             android:label="@string/login_activity_title">
@@ -45,9 +49,7 @@
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".feature.home.HomeActivity"
-            android:label="@string/home_activity_title" />
+
 
         <receiver android:name=".feature.appwidget.WidgetProvider">
             <intent-filter>

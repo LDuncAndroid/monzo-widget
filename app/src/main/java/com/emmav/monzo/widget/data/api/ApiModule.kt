@@ -2,7 +2,8 @@ package com.emmav.monzo.widget.data.api
 
 import android.content.Context
 import com.chuckerteam.chucker.api.ChuckerInterceptor
-import com.emmav.monzo.widget.data.storage.LoginStorage
+import com.emmav.monzo.widget.data.auth.ClientStorage
+import com.emmav.monzo.widget.data.auth.LoginStorage
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -13,9 +14,8 @@ import timber.log.Timber
 import java.io.IOException
 
 class ApiModule(
-    clientId: String,
-    clientSecret: String,
     context: Context,
+    clientStorage: ClientStorage,
     loginStorage: LoginStorage
 ) {
     private val baseHttpClient by lazy {
@@ -38,15 +38,14 @@ class ApiModule(
 
                 chain.proceed(requestBuilder.build())
             }
-            .authenticator(MonzoAuthenticator(baseHttpClient, clientId, clientSecret, loginStorage))
+            .authenticator(MonzoAuthenticator(baseHttpClient, clientStorage, loginStorage))
             .build()
             .createMonzoApi()
     }
 
     class MonzoAuthenticator(
         private val baseHttpClient: OkHttpClient,
-        private val clientId: String,
-        private val clientSecret: String,
+        private val clientStorage: ClientStorage,
         private val loginStorage: LoginStorage
     ) : Authenticator {
 
@@ -54,7 +53,11 @@ class ApiModule(
             return synchronized(this) {
                 // Make a new instance to avoid making another call with our expired access token
                 val monzoApi = baseHttpClient.createMonzoApi()
-                val call = monzoApi.refreshToken(clientId, clientSecret, loginStorage.refreshToken!!)
+                val call = monzoApi.refreshToken(
+                    clientId = clientStorage.clientId!!,
+                    clientSecret = clientStorage.clientSecret!!,
+                    refreshToken = loginStorage.refreshToken!!
+                )
                 try {
                     val tokenResponse = call.execute()
                     if (tokenResponse.code() == 200) {
