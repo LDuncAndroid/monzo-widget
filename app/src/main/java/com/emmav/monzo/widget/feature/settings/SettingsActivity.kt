@@ -5,9 +5,11 @@ import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.os.Bundle
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.emmav.monzo.widget.App
 import com.emmav.monzo.widget.R
 import com.emmav.monzo.widget.common.SimpleAdapter
@@ -16,9 +18,6 @@ import com.emmav.monzo.widget.common.visible
 import com.emmav.monzo.widget.feature.appwidget.EXTRA_WIDGET_TYPE_ID
 import com.emmav.monzo.widget.feature.appwidget.WidgetProvider
 import com.emmav.monzo.widget.feature.splash.SplashActivity
-import kotlinx.android.synthetic.main.activity_settings.*
-import kotlinx.android.synthetic.main.item_widget_settings_header.view.*
-import kotlinx.android.synthetic.main.item_widget_settings_row.view.*
 
 class SettingsActivity : AppCompatActivity() {
     private val appWidgetId by lazy {
@@ -31,6 +30,7 @@ class SettingsActivity : AppCompatActivity() {
     private val viewModel by lazy {
         App.get(this).settingsModule.provideSettingsViewModel(appWidgetId, widgetTypeId)
     }
+    private val settingsRecyclerView by lazy { findViewById<RecyclerView>(R.id.settingsRecyclerView) }
     private val rowsAdapter by lazy { RowsAdapter() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +48,7 @@ class SettingsActivity : AppCompatActivity() {
         viewModel.state.observe(this, Observer { state ->
             rowsAdapter.submitList(state.rows)
 
-            if(state.error) {
+            if (state.error) {
                 startActivity(SplashActivity.buildIntent(this))
                 finish()
             }
@@ -84,26 +84,26 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         private fun Row.Header.bind(holder: ViewHolder) {
-            holder.containerView.widgetSettingsHeaderRowTextView.text = title
+            holder.containerView.findViewById<TextView>(R.id.widgetSettingsHeaderRowTextView).text = title
         }
 
         private fun Row.Account.bind(holder: ViewHolder) {
-            holder.containerView.widgetSettingsRowTextView.text = "💳 $type"
+            holder.containerView.findViewById<TextView>(R.id.widgetSettingsRowTextView).text = "💳 $type"
             holder.containerView.setOnClickListener { click.invoke(Unit) }
             showOrHideSelected(isSelected, holder)
         }
 
         private fun Row.Pot.bind(holder: ViewHolder) {
-            holder.containerView.widgetSettingsRowTextView.text = "🍯 $name"
+            holder.containerView.findViewById<TextView>(R.id.widgetSettingsRowTextView).text = "🍯 $name"
             holder.containerView.setOnClickListener { click.invoke(Unit) }
             showOrHideSelected(isSelected, holder)
         }
 
         private fun showOrHideSelected(isSelected: Boolean, holder: ViewHolder) {
             if (isSelected) {
-                holder.containerView.widgetSettingsRowView.visible()
+                holder.containerView.findViewById<TextView>(R.id.widgetSettingsRowTextView).visible()
             } else {
-                holder.containerView.widgetSettingsRowView.gone()
+                holder.containerView.findViewById<TextView>(R.id.widgetSettingsRowTextView).gone()
             }
         }
     }

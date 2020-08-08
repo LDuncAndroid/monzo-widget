@@ -8,6 +8,6 @@ class SetupClientModule(
 ) {
 
     fun provideSetupClientViewModel(): SetupClientViewModel {
-        return SetupClientViewModel(clientRepository, redirectUri)
+        return SetupClientViewModel(clientRepository)
     }
 }

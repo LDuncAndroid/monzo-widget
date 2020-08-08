@@ -5,6 +5,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.emmav.monzo.widget.App
@@ -14,13 +17,23 @@ import com.emmav.monzo.widget.common.openUrl
 import com.emmav.monzo.widget.common.setVisibility
 import com.emmav.monzo.widget.feature.login.LoginActivity
 import com.emmav.monzo.widget.feature.setupclient.SetupClientViewModel.UiState
-import kotlinx.android.synthetic.main.activity_setup_client.*
 
 class SetupClientActivity : AppCompatActivity(), TextWatcher {
 
     private val viewModel by lazy {
         App.get(this).setupClientModule.provideSetupClientViewModel()
     }
+
+    private val createClientButton by lazy { findViewById<Button>(R.id.createClientButton) }
+    private val existingClientButton by lazy { findViewById<Button>(R.id.existingClientButton) }
+    private val goToCreateClientButton by lazy { findViewById<Button>(R.id.goToCreateClientButton) }
+
+    private val setupEnteredClientDetailsButton by lazy { findViewById<Button>(R.id.setupEnteredClientDetailsButton) }
+    private val setupClientIdEditText by lazy { findViewById<EditText>(R.id.setupClientIdEditText) }
+    private val setupClientSecretEditText by lazy { findViewById<EditText>(R.id.setupClientSecretEditText) }
+    private val setupEmojiTextView by lazy { findViewById<TextView>(R.id.setupEmojiTextView) }
+    private val setupTitleTextView by lazy { findViewById<TextView>(R.id.setupTitleTextView) }
+    private val setupSubtitleTextView by lazy { findViewById<TextView>(R.id.setupSubtitleTextView) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

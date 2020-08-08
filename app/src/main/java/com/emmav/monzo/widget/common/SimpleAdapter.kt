@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.extensions.LayoutContainer
 
 abstract class SimpleAdapter<T : Item> : ListAdapter<T, SimpleAdapter.ViewHolder>(DiffCallback<T>()) {
     final override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -28,7 +27,7 @@ abstract class SimpleAdapter<T : Item> : ListAdapter<T, SimpleAdapter.ViewHolder
         override fun areItemsTheSame(oldItem: T, newItem: T): Boolean = oldItem.id == newItem.id
     }
 
-    class ViewHolder(override val containerView: View) : RecyclerView.ViewHolder(containerView), LayoutContainer {
+    class ViewHolder(val containerView: View) : RecyclerView.ViewHolder(containerView) {
         val context: Context get() = containerView.context
     }
 }

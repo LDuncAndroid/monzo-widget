@@ -8,17 +8,8 @@ import com.emmav.monzo.widget.common.textRes
 import com.emmav.monzo.widget.data.auth.ClientRepository
 
 class SetupClientViewModel(
-    private val clientRepository: ClientRepository,
-    private val redirectUri: String
+    private val clientRepository: ClientRepository
 ) : BaseViewModel<SetupClientViewModel.State>(initialState = State()) {
-
-    init {
-        if (!clientRepository.clientConfigured) {
-
-        } else {
-
-        }
-    }
 
     fun onCreateClientClicked() {
         setState { copy(uiState = UiState.CREATE_INSTRUCTIONS) }
