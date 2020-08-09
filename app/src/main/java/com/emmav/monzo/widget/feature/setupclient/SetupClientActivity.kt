@@ -118,12 +118,12 @@ fun Input(
     clientSecretChanged: (String) -> Unit
 ) {
     Column(modifier = modifier.padding(top = 16.dp)) {
-        TextField(value = state.clientId ?: "",
+        TextField(value = state.clientId,
             modifier = Modifier.fillMaxWidth(),
             onValueChange = { clientIdChanged(it) },
             label = { Text(ContextAmbient.current.getString(R.string.setup_enter_client_id_hint)) }
         )
-        TextField(value = state.clientSecret ?: "",
+        TextField(value = state.clientSecret,
             modifier = Modifier.fillMaxWidth(),
             onValueChange = { clientSecretChanged(it) },
             label = { Text(ContextAmbient.current.getString(R.string.setup_enter_client_secret_hint)) }
@@ -161,7 +161,7 @@ fun Actions(
             SetupClientViewModel.UiState.ENTER_CLIENT_DETAILS -> {
                 FullWidthButton(
                     title = R.string.setup_entered_client_details,
-                    enabled = state.clientId != null && state.clientSecret != null,
+                    enabled = state.clientId.isNotBlank() && state.clientSecret.isNotBlank(),
                     onClick = { submitClicked() }
                 )
             }

@@ -41,8 +41,8 @@ class SetupClientViewModel(
     data class State(
         val uiState: UiState = UiState.WELCOME,
         val openCreateClientInBrowser: Boolean = false,
-        val clientId: String? = null,
-        val clientSecret: String? = null,
+        val clientId: String = "",
+        val clientSecret: String = "",
         val finished: Boolean = false
     )
 
