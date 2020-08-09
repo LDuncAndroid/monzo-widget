@@ -19,16 +19,26 @@ class SetupClientViewModel(
         setState { copy(uiState = UiState.ENTER_CLIENT_DETAILS) }
     }
 
-    fun onClientDetailsEntered(clientId: String, clientSecret: String) {
-        clientRepository.clientId = clientId
-        clientRepository.clientSecret = clientSecret
+    fun onClientIdChanged(clientId: String) {
+        setState { copy(clientId = clientId) }
     }
 
-    fun onClientDetailsChanged(clientId: String?, clientSecret: String?) {
-        setState { copy(canSaveClientDetails = !clientId.isNullOrBlank() && !clientSecret.isNullOrBlank()) }
+    fun onClientSecretChanged(clientSecret: String) {
+        setState { copy(clientSecret = clientSecret) }
     }
 
-    data class State(val uiState: UiState = UiState.WELCOME, val canSaveClientDetails: Boolean = false)
+    fun onSubmit() {
+        clientRepository.clientId = state.value!!.clientId
+        clientRepository.clientSecret = state.value!!.clientSecret
+        setState { copy(finished = true) }
+    }
+
+    data class State(
+        val uiState: UiState = UiState.WELCOME,
+        val clientId: String? = null,
+        val clientSecret: String? = null,
+        val finished: Boolean = false
+    )
 
     enum class UiState(val emoji: Text, val title: Text, val subtitle: Text = Text.Empty) {
         WELCOME(

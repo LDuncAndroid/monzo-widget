@@ -19,8 +19,8 @@
     <string name="setup_info_subtitle">Log in with the Monzo Developer Portal, create a confidential client, and set the redirect uri to https://monzowidget</string>
     <string name="setup_info_action">Go to Monzo Developer Portal</string>
     <string name="setup_enter_client_details_title">Enter client details</string>
-    <string name="setup_enter_client_id_hint">client id</string>
-    <string name="setup_enter_client_secret_hint">client secret</string>
+    <string name="setup_enter_client_id_hint">Client id</string>
+    <string name="setup_enter_client_secret_hint">Client secret</string>
     <string name="setup_entered_client_details">Done</string>
 
     <!-- Login -->
