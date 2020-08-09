@@ -19,15 +19,20 @@ class SetupClientViewModel(
         setState { copy(uiState = UiState.ENTER_CLIENT_DETAILS) }
     }
 
+    fun onGoToCreateClientClicked() {
+        setState { copy(openCreateClientInBrowser = true) }
+        onHasExistingClientClicked()
+    }
+
     fun onClientIdChanged(clientId: String) {
-        setState { copy(clientId = clientId) }
+        setState { copy(clientId = clientId, openCreateClientInBrowser = false) }
     }
 
     fun onClientSecretChanged(clientSecret: String) {
-        setState { copy(clientSecret = clientSecret) }
+        setState { copy(clientSecret = clientSecret, openCreateClientInBrowser = false) }
     }
 
-    fun onSubmit() {
+    fun onSubmitClicked() {
         clientRepository.clientId = state.value!!.clientId
         clientRepository.clientSecret = state.value!!.clientSecret
         setState { copy(finished = true) }
@@ -35,6 +40,7 @@ class SetupClientViewModel(
 
     data class State(
         val uiState: UiState = UiState.WELCOME,
+        val openCreateClientInBrowser: Boolean = false,
         val clientId: String? = null,
         val clientSecret: String? = null,
         val finished: Boolean = false

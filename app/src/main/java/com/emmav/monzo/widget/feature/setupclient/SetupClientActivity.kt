@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.ui.tooling.preview.Preview
 import com.emmav.monzo.widget.App
 import com.emmav.monzo.widget.R
 import com.emmav.monzo.widget.common.AppTheme
@@ -47,138 +48,20 @@ class SetupClientActivity : AppCompatActivity() {
                         startActivity(LoginActivity.buildIntent(ContextAmbient.current))
                         finish()
                     }
-                    Content(state)
-                }
-            }
-        }
-    }
-
-    @Composable
-    fun Content(state: SetupClientViewModel.State) {
-        ConstraintLayout(modifier = Modifier.fillMaxSize().padding(all = 16.dp)) {
-            val (info, input, actions) = createRefs()
-            Info(
-                modifier = Modifier.constrainAs(info) {
-                    centerHorizontallyTo(parent)
-                    linkTo(top = parent.top, bottom = input.top)
-                },
-                emoji = state.uiState.emoji,
-                title = state.uiState.title,
-                subtitle = state.uiState.subtitle
-            )
-            if (state.uiState == SetupClientViewModel.UiState.ENTER_CLIENT_DETAILS) {
-                Input(modifier = Modifier.constrainAs(input) {
-                    top.linkTo(info.bottom)
-                }, state = state)
-            }
-            Actions(
-                modifier = Modifier.constrainAs(actions) {
-                    bottom.linkTo(parent.bottom)
-                }, state = state
-            )
-        }
-    }
-
-    @Composable
-    fun Info(
-        modifier: Modifier,
-        emoji: Text,
-        title: Text,
-        subtitle: Text
-    ) {
-        Column(modifier = modifier, horizontalGravity = Alignment.CenterHorizontally) {
-            Text(
-                text = ContextAmbient.current.resolveText(emoji),
-                fontSize = 84.sp
-            )
-            Text(
-                text = ContextAmbient.current.resolveText(title),
-                fontSize = 22.sp,
-                modifier = Modifier.padding(top = 32.dp)
-            )
-            Text(
-                text = ContextAmbient.current.resolveText(subtitle),
-                fontSize = 16.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 16.dp)
-            )
-        }
-    }
-
-    @Composable
-    fun Input(
-        modifier: Modifier,
-        state: SetupClientViewModel.State
-    ) {
-        Column(modifier = modifier.padding(top = 16.dp)) {
-            TextField(value = state.clientId ?: "",
-                modifier = Modifier.fillMaxWidth(),
-                onValueChange = {
-                    viewModel.onClientIdChanged(clientId = it)
-                },
-                label = { Text(ContextAmbient.current.getString(R.string.setup_enter_client_id_hint)) }
-            )
-            TextField(value = state.clientSecret ?: "",
-                modifier = Modifier.fillMaxWidth(),
-                onValueChange = {
-                    viewModel.onClientSecretChanged(clientSecret = it)
-                },
-                label = { Text(ContextAmbient.current.getString(R.string.setup_enter_client_secret_hint)) }
-            )
-        }
-    }
-
-    @Composable
-    fun Actions(
-        modifier: Modifier,
-        state: SetupClientViewModel.State
-    ) {
-        Column(modifier = modifier) {
-            when (state.uiState) {
-                SetupClientViewModel.UiState.WELCOME -> {
-                    FullWidthButton(
-                        title = R.string.setup_welcome_action_positive,
-                        onClick = { viewModel.onHasExistingClientClicked() }
-                    )
-                    FullWidthButton(
-                        title = R.string.setup_welcome_action_negative,
-                        onClick = { viewModel.onCreateClientClicked() }
-                    )
-                }
-                SetupClientViewModel.UiState.CREATE_INSTRUCTIONS -> {
-                    FullWidthButton(
-                        title = R.string.setup_info_action,
-                        onClick = {
-                            openUrl("https://developers.monzo.com/api")
-                            viewModel.onHasExistingClientClicked()
-                        }
-                    )
-                }
-                SetupClientViewModel.UiState.ENTER_CLIENT_DETAILS -> {
-                    FullWidthButton(
-                        title = R.string.setup_entered_client_details,
-                        enabled = state.clientId != null && state.clientSecret != null,
-                        onClick = { viewModel.onSubmit() }
+                    if (state.openCreateClientInBrowser) {
+                        ContextAmbient.current.openUrl("https://developers.monzo.com")
+                    }
+                    Content(
+                        state = state,
+                        clientIdChanged = { viewModel.onClientIdChanged(clientId = it) },
+                        clientSecretChanged = { viewModel.onClientSecretChanged(clientSecret = it) },
+                        hasExistingClientClicked = { viewModel.onHasExistingClientClicked() },
+                        goToCreateClientClicked = { viewModel.onGoToCreateClientClicked() },
+                        createClientClicked = { viewModel.onCreateClientClicked() },
+                        submitClicked = { viewModel.onSubmitClicked() }
                     )
                 }
             }
-        }
-    }
-
-    @Composable
-    fun FullWidthButton(
-        onClick: () -> Unit,
-        title: Int,
-        enabled: Boolean = true
-    ) {
-        Button(
-            onClick = onClick,
-            enabled = enabled,
-            modifier = Modifier.padding(bottom = 16.dp).fillMaxWidth()
-        ) {
-            Text(
-                text = ContextAmbient.current.getString(title).toUpperCase(Locale.getDefault()),
-            )
         }
     }
 
@@ -186,5 +69,151 @@ class SetupClientActivity : AppCompatActivity() {
         fun buildIntent(context: Context): Intent {
             return Intent(context, SetupClientActivity::class.java)
         }
+    }
+}
+
+@Composable
+fun Content(
+    state: SetupClientViewModel.State,
+    clientIdChanged: (String) -> Unit,
+    clientSecretChanged: (String) -> Unit,
+    hasExistingClientClicked: () -> Unit,
+    goToCreateClientClicked: () -> Unit,
+    createClientClicked: () -> Unit,
+    submitClicked: () -> Unit
+) {
+    ConstraintLayout(modifier = Modifier.fillMaxSize().padding(all = 16.dp)) {
+        val (info, input, actions) = createRefs()
+        Info(
+            modifier = Modifier.constrainAs(info) {
+                centerHorizontallyTo(parent)
+                linkTo(top = parent.top, bottom = input.top)
+            },
+            emoji = state.uiState.emoji,
+            title = state.uiState.title,
+            subtitle = state.uiState.subtitle
+        )
+        if (state.uiState == SetupClientViewModel.UiState.ENTER_CLIENT_DETAILS) {
+            Input(
+                modifier = Modifier.constrainAs(input) {
+                    top.linkTo(info.bottom)
+                },
+                state = state,
+                clientIdChanged = clientIdChanged,
+                clientSecretChanged = clientSecretChanged
+            )
+        }
+        Actions(
+            modifier = Modifier.constrainAs(actions) {
+                bottom.linkTo(parent.bottom)
+            },
+            state = state,
+            hasExistingClientClicked = hasExistingClientClicked,
+            goToCreateClientClicked = goToCreateClientClicked,
+            createClientClicked = createClientClicked,
+            submitClicked = submitClicked
+        )
+    }
+}
+
+@Composable
+fun Info(
+    modifier: Modifier,
+    emoji: Text,
+    title: Text,
+    subtitle: Text
+) {
+    Column(modifier = modifier, horizontalGravity = Alignment.CenterHorizontally) {
+        Text(
+            text = ContextAmbient.current.resolveText(emoji),
+            fontSize = 84.sp
+        )
+        Text(
+            text = ContextAmbient.current.resolveText(title),
+            fontSize = 22.sp,
+            modifier = Modifier.padding(top = 32.dp)
+        )
+        Text(
+            text = ContextAmbient.current.resolveText(subtitle),
+            fontSize = 16.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 16.dp)
+        )
+    }
+}
+
+@Composable
+fun Input(
+    modifier: Modifier,
+    state: SetupClientViewModel.State,
+    clientIdChanged: (String) -> Unit,
+    clientSecretChanged: (String) -> Unit
+) {
+    Column(modifier = modifier.padding(top = 16.dp)) {
+        TextField(value = state.clientId ?: "",
+            modifier = Modifier.fillMaxWidth(),
+            onValueChange = { clientIdChanged(it) },
+            label = { Text(ContextAmbient.current.getString(R.string.setup_enter_client_id_hint)) }
+        )
+        TextField(value = state.clientSecret ?: "",
+            modifier = Modifier.fillMaxWidth(),
+            onValueChange = { clientSecretChanged(it) },
+            label = { Text(ContextAmbient.current.getString(R.string.setup_enter_client_secret_hint)) }
+        )
+    }
+}
+
+@Composable
+fun Actions(
+    modifier: Modifier,
+    state: SetupClientViewModel.State,
+    hasExistingClientClicked: () -> Unit,
+    goToCreateClientClicked: () -> Unit,
+    createClientClicked: () -> Unit,
+    submitClicked: () -> Unit
+) {
+    Column(modifier = modifier) {
+        when (state.uiState) {
+            SetupClientViewModel.UiState.WELCOME -> {
+                FullWidthButton(
+                    title = R.string.setup_welcome_action_positive,
+                    onClick = { hasExistingClientClicked() }
+                )
+                FullWidthButton(
+                    title = R.string.setup_welcome_action_negative,
+                    onClick = { createClientClicked() }
+                )
+            }
+            SetupClientViewModel.UiState.CREATE_INSTRUCTIONS -> {
+                FullWidthButton(
+                    title = R.string.setup_info_action,
+                    onClick = { goToCreateClientClicked() }
+                )
+            }
+            SetupClientViewModel.UiState.ENTER_CLIENT_DETAILS -> {
+                FullWidthButton(
+                    title = R.string.setup_entered_client_details,
+                    enabled = state.clientId != null && state.clientSecret != null,
+                    onClick = { submitClicked() }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun FullWidthButton(
+    onClick: () -> Unit,
+    title: Int,
+    enabled: Boolean = true
+) {
+    Button(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = Modifier.padding(bottom = 16.dp).fillMaxWidth()
+    ) {
+        Text(
+            text = ContextAmbient.current.getString(title).toUpperCase(Locale.getDefault()),
+        )
     }
 }
