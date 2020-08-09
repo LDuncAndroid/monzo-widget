@@ -11,14 +11,13 @@ import org.junit.Test
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when` as whenever
 
-private const val CLIENT_ID = "CLIENT_ID"
 private const val REDIRECT_URI = "REDIRECT_URI"
 
 class LoginViewModelTest {
     @Rule @JvmField val rxSchedulerRule = RxSchedulerRule()
     @Rule @JvmField val rule = InstantTaskExecutorRule()
 
-    private val authenticationRepository = mock<LoginRepository> {
+    private val loginRepository = mock<LoginRepository> {
         whenever(it.hasToken).thenReturn(true)
         whenever(it.testAuthentication()).thenReturn(Single.just(true))
     }
@@ -26,16 +25,15 @@ class LoginViewModelTest {
 
     private val viewModel by lazy {
         LoginViewModel(
-            clientId = CLIENT_ID,
             redirectUri = REDIRECT_URI,
-            authenticationRepository = authenticationRepository,
-            workManager = workManager
+            workManager = workManager,
+            loginRepository = loginRepository
         )
     }
 
     @Test fun `if authenticated, check SCA state`() {
         viewModel
 
-        verify(authenticationRepository).testAuthentication()
+        verify(loginRepository).testAuthentication()
     }
 }
