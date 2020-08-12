@@ -3,61 +3,77 @@ package com.emmav.monzo.widget.feature.login
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
-import android.widget.Button
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ConstraintLayout
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.unit.dp
 import com.emmav.monzo.widget.App
 import com.emmav.monzo.widget.R
-import com.emmav.monzo.widget.common.bindText
+import com.emmav.monzo.widget.common.AppTheme
+import com.emmav.monzo.widget.common.FullWidthButton
+import com.emmav.monzo.widget.common.Info
 import com.emmav.monzo.widget.common.openUrl
-import com.emmav.monzo.widget.common.setVisibility
 
 class LoginActivity : AppCompatActivity() {
     private val viewModel by lazy { App.get(this).loginModule.provideLoginViewModel() }
 
-    private val loginActionButton by lazy { findViewById<Button>(R.id.loginActionButton) }
-    private val loginProgressBar by lazy { findViewById<View>(R.id.loginProgressBar) }
-    private val loginEmojiTextView by lazy { findViewById<TextView>(R.id.loginEmojiTextView) }
-    private val loginTitleTextView by lazy { findViewById<TextView>(R.id.loginTitleTextView) }
-    private val loginSubtitleTextView by lazy { findViewById<TextView>(R.id.loginSubtitleTextView) }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_login)
+        setContent {
+            AppTheme {
+                Column {
+                    TopAppBar(title = { Text(ContextAmbient.current.getString(R.string.login_activity_title)) })
 
-        loginActionButton.setOnClickListener {
-            if (viewModel.state.value is LoginViewModel.State.RequiresStrongCustomerAuthentication) {
-                val monzoAppIntent = packageManager.getLaunchIntentForPackage("co.uk.getmondo")
-                if (monzoAppIntent != null) {
-                    startActivity(monzoAppIntent)
-                } else {
-                    Toast.makeText(this, R.string.login_requires_sca_monzo_not_installed, Toast.LENGTH_SHORT).show()
+                    val state by viewModel.state.observeAsState(LoginViewModel.State.Unknown())
+                    when (state) {
+                        is LoginViewModel.State.RequestMagicLink -> {
+                            (state as LoginViewModel.State.RequestMagicLink).url?.let {
+                                openUrl(it)
+                                finish()
+                            }
+                        }
+                        is LoginViewModel.State.RequiresStrongCustomerAuthentication -> {
+                            if ((state as LoginViewModel.State.RequiresStrongCustomerAuthentication).openMonzoApp) {
+                                val monzoAppIntent = packageManager.getLaunchIntentForPackage("co.uk.getmondo")
+                                if (monzoAppIntent != null) {
+                                    startActivity(monzoAppIntent)
+                                } else {
+                                    Toast.makeText(
+                                        ContextAmbient.current,
+                                        R.string.login_requires_sca_monzo_not_installed,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        }
+                        is LoginViewModel.State.Authenticated -> {
+                            if ((state as LoginViewModel.State.Authenticated).finish) {
+                                finish()
+                            }
+                        }
+                    }
+
+                    Content(
+                        state = state,
+                        loginClicked = { viewModel.onLoginClicked() },
+                        openMonzoApp = { viewModel.onOpenMonzoAppClicked() },
+                        loggedIn = { viewModel.onLoggedInClicked() }
+                    )
                 }
-            } else if (viewModel.state.value is LoginViewModel.State.Authenticated) {
-                finish()
-            } else {
-                viewModel.onLoginClicked()
             }
         }
-
-        viewModel.state.observe(this, Observer { state ->
-            loginProgressBar.setVisibility(visible = state.showLoading)
-            loginActionButton.bindText(state.actionButton)
-            loginEmojiTextView.bindText(state.emoji)
-            loginTitleTextView.bindText(state.title)
-            loginSubtitleTextView.bindText(state.subtitle)
-
-            if (state is LoginViewModel.State.RequestMagicLink) {
-                state.url?.let {
-                    openUrl(it)
-                    finish()
-                }
-            }
-        })
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -80,3 +96,65 @@ class LoginActivity : AppCompatActivity() {
     }
 }
 
+@Composable
+fun Content(
+    state: LoginViewModel.State,
+    loginClicked: () -> Unit,
+    openMonzoApp: () -> Unit,
+    loggedIn: () -> Unit,
+) {
+    ConstraintLayout(modifier = Modifier.fillMaxSize().padding(all = 16.dp)) {
+        val (info, actions) = createRefs()
+        Info(
+            modifier = Modifier.constrainAs(info) {
+                centerHorizontallyTo(parent)
+                linkTo(top = parent.top, bottom = actions.top)
+            },
+            emoji = state.emoji,
+            title = state.title,
+            subtitle = state.subtitle
+        )
+        Actions(
+            modifier = Modifier.constrainAs(actions) {
+                bottom.linkTo(parent.bottom)
+            },
+            state = state,
+            loginClicked = loginClicked,
+            openMonzoApp = openMonzoApp,
+            loggedIn = loggedIn
+        )
+    }
+}
+
+
+@Composable
+fun Actions(
+    modifier: Modifier,
+    state: LoginViewModel.State,
+    loginClicked: () -> Unit,
+    openMonzoApp: () -> Unit,
+    loggedIn: () -> Unit,
+) {
+    Column(modifier = modifier) {
+        when (state) {
+            is LoginViewModel.State.Unauthenticated -> {
+                FullWidthButton(
+                    title = R.string.login_unauthed_action,
+                    onClick = { loginClicked() }
+                )
+            }
+            is LoginViewModel.State.RequiresStrongCustomerAuthentication -> {
+                FullWidthButton(
+                    title = R.string.login_requires_sca_action,
+                    onClick = { openMonzoApp() }
+                )
+            }
+            is LoginViewModel.State.Authenticated -> {
+                FullWidthButton(
+                    title = R.string.login_logged_in_action,
+                    onClick = { loggedIn() }
+                )
+            }
+        }
+    }
+}

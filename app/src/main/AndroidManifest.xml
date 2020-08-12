@@ -26,12 +26,11 @@
         </activity>
         <activity
             android:name=".feature.setupclient.SetupClientActivity"
-            android:label="@string/setup_activity_title"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".feature.login.LoginActivity"
-            android:label="@string/login_activity_title">
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +37,7 @@ fun Info(
             text = ContextAmbient.current.resolveText(subtitle),
             fontSize = 16.sp,
             textAlign = TextAlign.Center,
+            color = AppColors.onSecondary,
             modifier = Modifier.padding(top = 16.dp)
         )
     }
