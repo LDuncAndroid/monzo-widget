@@ -78,16 +78,21 @@ fun Content(
 ) {
     ConstraintLayout(modifier = Modifier.fillMaxSize().padding(all = 16.dp)) {
         val (info, input, actions) = createRefs()
+        val inputVisible = state.uiState == SetupClientViewModel.UiState.ENTER_CLIENT_DETAILS
         Info(
             modifier = Modifier.constrainAs(info) {
                 centerHorizontallyTo(parent)
-                linkTo(top = parent.top, bottom = input.top)
+                if (inputVisible) {
+                    linkTo(top = parent.top, bottom = input.top)
+                } else {
+                    linkTo(top = parent.top, bottom = actions.top)
+                }
             },
             emoji = state.uiState.emoji,
             title = state.uiState.title,
             subtitle = state.uiState.subtitle
         )
-        if (state.uiState == SetupClientViewModel.UiState.ENTER_CLIENT_DETAILS) {
+        if (inputVisible) {
             Input(
                 modifier = Modifier.constrainAs(input) {
                     top.linkTo(info.bottom)
