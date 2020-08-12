@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
@@ -18,15 +19,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.dp
-import com.emmav.monzo.widget.App
 import com.emmav.monzo.widget.R
 import com.emmav.monzo.widget.common.AppTheme
 import com.emmav.monzo.widget.common.FullWidthButton
 import com.emmav.monzo.widget.common.Info
 import com.emmav.monzo.widget.common.openUrl
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
-    private val viewModel by lazy { App.get(this).loginModule.provideLoginViewModel() }
+    @Inject lateinit var vmFactory: LoginViewModel.AssistedFactory
+    private val viewModel: LoginViewModel by viewModels {
+        LoginViewModel.provideFactory(
+            vmFactory,
+            redirectUri = getString(R.string.callback_url_scheme) + "://" + getString(R.string.callback_url_host)
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

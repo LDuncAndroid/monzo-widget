@@ -1,19 +1,23 @@
 package com.emmav.monzo.widget.feature.settings
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.emmav.monzo.widget.common.BaseViewModel
 import com.emmav.monzo.widget.common.Item
 import com.emmav.monzo.widget.data.api.toLongAccountType
 import com.emmav.monzo.widget.data.auth.LoginRepository
 import com.emmav.monzo.widget.data.db.MonzoRepository
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.plusAssign
 
-class SettingsViewModel(
-    private val appWidgetId: Int,
-    private val widgetTypeId: String?,
-    private val loginRepository: LoginRepository,
+class SettingsViewModel @AssistedInject constructor(
+    @Assisted private val appWidgetId: Int,
+    @Assisted private val widgetTypeId: String?,
+    loginRepository: LoginRepository,
     private val monzoRepository: MonzoRepository
 ) : BaseViewModel<SettingsViewModel.State>(initialState = State()) {
 
@@ -79,6 +83,24 @@ class SettingsViewModel(
         val complete: Boolean = false,
         val error: Boolean = false
     )
+
+    @AssistedInject.Factory
+    interface AssistedFactory {
+        fun create(appWidgetId: Int, widgetTypeId: String?): SettingsViewModel
+    }
+
+    companion object {
+        fun provideFactory(
+            assistedFactory: AssistedFactory,
+            appWidgetId: Int,
+            widgetTypeId: String?
+        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
+                return assistedFactory.create(appWidgetId, widgetTypeId) as T
+            }
+        }
+    }
 }
 
 sealed class Row : Item {

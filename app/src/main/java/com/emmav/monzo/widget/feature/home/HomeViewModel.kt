@@ -1,5 +1,6 @@
 package com.emmav.monzo.widget.feature.home
 
+import androidx.hilt.lifecycle.ViewModelInject
 import com.emmav.monzo.widget.common.BaseViewModel
 import com.emmav.monzo.widget.common.Item
 import com.emmav.monzo.widget.data.api.toLongAccountType
@@ -8,7 +9,9 @@ import com.emmav.monzo.widget.data.appwidget.WidgetRepository
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 
-class HomeViewModel(widgetRepository: WidgetRepository) : BaseViewModel<HomeViewModel.State>(initialState = State()) {
+class HomeViewModel @ViewModelInject constructor(
+    widgetRepository: WidgetRepository
+) : BaseViewModel<HomeViewModel.State>(initialState = State()) {
 
     init {
         disposables += widgetRepository.allWidgets()

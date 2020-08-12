@@ -1,5 +1,7 @@
 package com.emmav.monzo.widget.feature.login
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.emmav.monzo.widget.R
@@ -9,6 +11,8 @@ import com.emmav.monzo.widget.common.text
 import com.emmav.monzo.widget.common.textRes
 import com.emmav.monzo.widget.data.auth.LoginRepository
 import com.emmav.monzo.widget.feature.sync.SyncWorker
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
@@ -16,10 +20,10 @@ import java.util.concurrent.TimeUnit
 
 private const val SECONDS_TO_REDIRECT = 5L
 
-class LoginViewModel(
+class LoginViewModel @AssistedInject constructor(
     private val loginRepository: LoginRepository,
-    private val redirectUri: String,
-    private val workManager: WorkManager
+    private val workManager: WorkManager,
+    @Assisted private val redirectUri: String
 ) : BaseViewModel<LoginViewModel.State>(initialState = State.Unknown()) {
 
     init {
@@ -161,5 +165,22 @@ class LoginViewModel(
             override val subtitle: Text = textRes(R.string.login_logged_in_subtitle),
             val finish: Boolean = false
         ) : State()
+    }
+
+    @AssistedInject.Factory
+    interface AssistedFactory {
+        fun create(redirectUri: String): LoginViewModel
+    }
+
+    companion object {
+        fun provideFactory(
+            assistedFactory: AssistedFactory,
+            redirectUri: String
+        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
+                return assistedFactory.create(redirectUri) as T
+            }
+        }
     }
 }

@@ -1,11 +1,13 @@
 package com.emmav.monzo.widget.data.auth
 
 import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
 private const val KEY_CLIENT_ID = "KEY_CLIENT_ID"
 private const val KEY_CLIENT_SECRET = "KEY_CLIENT_SECRET"
 
-class ClientStorage(context: Context) {
+class ClientStorage @Inject constructor(@ApplicationContext context: Context) {
 
     private val sharedPreferences by lazy {
         context.getSharedPreferences("client_storage", Context.MODE_PRIVATE)

@@ -2,13 +2,15 @@ package com.emmav.monzo.widget.data.auth
 
 import android.content.Context
 import com.emmav.monzo.widget.data.api.ApiToken
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
 private const val KEY_REFRESH_TOKEN = "KEY_REFRESH_TOKEN"
 private const val KEY_ACCESS_TOKEN = "KEY_ACCESS_TOKEN"
 private const val KEY_TOKEN_TYPE = "KEY_TOKEN_TYPE"
 private const val KEY_STATE = "KEY_STATE"
 
-class LoginStorage(context: Context) {
+class LoginStorage @Inject constructor(@ApplicationContext context: Context) {
 
     private val sharedPreferences by lazy {
         context.getSharedPreferences("auth", Context.MODE_PRIVATE)

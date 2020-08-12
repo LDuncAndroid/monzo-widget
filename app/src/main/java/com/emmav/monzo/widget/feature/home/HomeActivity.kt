@@ -5,18 +5,20 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.emmav.monzo.widget.App
 import com.emmav.monzo.widget.R
 import com.emmav.monzo.widget.common.SimpleAdapter
 import com.emmav.monzo.widget.common.gone
 import com.emmav.monzo.widget.common.visible
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class HomeActivity : AppCompatActivity() {
-    private val viewModel by lazy { App.get(this).homeModule.provideHomeViewModel() }
+    private val viewModel: HomeViewModel by viewModels()
 
     private val homeRecyclerView by lazy { findViewById<RecyclerView>(R.id.homeRecyclerView) }
     private val homeProgressBar by lazy { findViewById<View>(R.id.homeProgressBar) }

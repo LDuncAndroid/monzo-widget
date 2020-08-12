@@ -1,5 +1,6 @@
 package com.emmav.monzo.widget.feature.setupclient
 
+import androidx.hilt.lifecycle.ViewModelInject
 import com.emmav.monzo.widget.R
 import com.emmav.monzo.widget.common.BaseViewModel
 import com.emmav.monzo.widget.common.Text
@@ -7,7 +8,7 @@ import com.emmav.monzo.widget.common.text
 import com.emmav.monzo.widget.common.textRes
 import com.emmav.monzo.widget.data.auth.ClientRepository
 
-class SetupClientViewModel(
+class SetupClientViewModel @ViewModelInject constructor(
     private val clientRepository: ClientRepository
 ) : BaseViewModel<SetupClientViewModel.State>(initialState = State()) {
 

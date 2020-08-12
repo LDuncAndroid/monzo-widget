@@ -6,8 +6,9 @@ import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 
-class WidgetRepository(private val monzoStorage: MonzoStorage) {
+class WidgetRepository @Inject constructor(private val monzoStorage: MonzoStorage) {
 
     fun widgetById(id: Int): Maybe<Widget> {
         return monzoStorage.widgetById(id = id)

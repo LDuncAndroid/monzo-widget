@@ -1,10 +1,11 @@
 package com.emmav.monzo.widget.feature.splash
 
+import androidx.hilt.lifecycle.ViewModelInject
 import com.emmav.monzo.widget.common.BaseViewModel
 import com.emmav.monzo.widget.data.auth.ClientRepository
 import com.emmav.monzo.widget.data.auth.LoginRepository
 
-class SplashViewModel(
+class SplashViewModel @ViewModelInject constructor(
     clientRepository: ClientRepository,
     loginRepository: LoginRepository
 ) : BaseViewModel<SplashViewModel.State>(initialState = State()) {

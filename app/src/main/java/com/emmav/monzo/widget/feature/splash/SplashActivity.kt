@@ -3,19 +3,18 @@ package com.emmav.monzo.widget.feature.splash
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import com.emmav.monzo.widget.App
 import com.emmav.monzo.widget.feature.home.HomeActivity
 import com.emmav.monzo.widget.feature.login.LoginActivity
 import com.emmav.monzo.widget.feature.setupclient.SetupClientActivity
 import com.emmav.monzo.widget.feature.splash.SplashViewModel.AppState
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
-
-    private val viewModel by lazy {
-        App.get(this).splashModule.provideSplashViewModel()
-    }
+    private val viewModel: SplashViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

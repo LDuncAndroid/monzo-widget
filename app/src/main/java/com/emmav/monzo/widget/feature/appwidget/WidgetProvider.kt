@@ -14,29 +14,32 @@ import android.text.style.AbsoluteSizeSpan
 import android.text.style.ForegroundColorSpan
 import android.widget.RemoteViews
 import androidx.core.content.ContextCompat
-import com.emmav.monzo.widget.App
 import com.emmav.monzo.widget.R
 import com.emmav.monzo.widget.common.TypefaceSpan
 import com.emmav.monzo.widget.common.toPx
 import com.emmav.monzo.widget.data.api.toShortAccountType
 import com.emmav.monzo.widget.data.appwidget.Widget
+import com.emmav.monzo.widget.data.appwidget.WidgetRepository
 import com.emmav.monzo.widget.feature.settings.SettingsActivity
+import dagger.hilt.android.AndroidEntryPoint
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.util.*
+import javax.inject.Inject
 
 const val EXTRA_WIDGET_TYPE_ID = "EXTRA_ID"
 
+@AndroidEntryPoint
 class WidgetProvider : AppWidgetProvider() {
+    @Inject lateinit var widgetRepository: WidgetRepository
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        updateAllWidgets(context, appWidgetManager)
+        updateAllWidgets(context, appWidgetManager, widgetRepository)
     }
 
     @SuppressLint("CheckResult")
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {
-        val repository = App.get(context = context).widgetRepository
-        repository.deleteRemovedWidgets(widgetIds = appWidgetIds.toList()).blockingGet()
+        widgetRepository.deleteRemovedWidgets(widgetIds = appWidgetIds.toList()).blockingGet()
     }
 
     companion object {
@@ -47,29 +50,32 @@ class WidgetProvider : AppWidgetProvider() {
         }
 
         @SuppressLint("CheckResult")
-        fun updateAllWidgets(context: Context, appWidgetManager: AppWidgetManager) {
+        fun updateAllWidgets(context: Context, appWidgetManager: AppWidgetManager, widgetRepository: WidgetRepository) {
             val thisWidget = ComponentName(context, WidgetProvider::class.java)
             val allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget)
 
-            val repository = App.get(context = context).widgetRepository
-            repository.deleteRemovedWidgets(widgetIds = allWidgetIds.toList()).blockingGet()
+            widgetRepository.deleteRemovedWidgets(widgetIds = allWidgetIds.toList()).blockingGet()
 
             for (i in allWidgetIds) {
                 updateWidget(
                     context,
                     i,
-                    appWidgetManager
+                    appWidgetManager,
+                    widgetRepository
                 )
             }
         }
 
-        fun updateWidget(context: Context, widgetId: Int, appWidgetManager: AppWidgetManager) {
-            val repository = App.get(context = context).widgetRepository
-
+        fun updateWidget(
+            context: Context,
+            widgetId: Int,
+            appWidgetManager: AppWidgetManager,
+            widgetRepository: WidgetRepository
+        ) {
             val intent = Intent(context, SettingsActivity::class.java)
                 .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
 
-            val it = repository.widgetById(id = widgetId).blockingGet()
+            val it = widgetRepository.widgetById(id = widgetId).blockingGet()
             val textColour = ContextCompat.getColor(context, R.color.monzo_dark)
 
             if (it is Widget.Balance) {
@@ -84,7 +90,12 @@ class WidgetProvider : AppWidgetProvider() {
                         intent.putExtra(EXTRA_WIDGET_TYPE_ID, it.accountId)
                         updateWidget(
                             context = context,
-                            pendingIntent = PendingIntent.getActivity(context, widgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT),
+                            pendingIntent = PendingIntent.getActivity(
+                                context,
+                                widgetId,
+                                intent,
+                                PendingIntent.FLAG_UPDATE_CURRENT
+                            ),
                             amount = spannableString,
                             subtitle = "💳 ${it.type.toShortAccountType()}",
                             appWidgetManager = appWidgetManager,
@@ -95,7 +106,12 @@ class WidgetProvider : AppWidgetProvider() {
                         intent.putExtra(EXTRA_WIDGET_TYPE_ID, it.potId)
                         updateWidget(
                             context = context,
-                            pendingIntent = PendingIntent.getActivity(context, widgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT),
+                            pendingIntent = PendingIntent.getActivity(
+                                context,
+                                widgetId,
+                                intent,
+                                PendingIntent.FLAG_UPDATE_CURRENT
+                            ),
                             amount = spannableString,
                             subtitle = "🍯 ${it.name}",
                             appWidgetManager = appWidgetManager,

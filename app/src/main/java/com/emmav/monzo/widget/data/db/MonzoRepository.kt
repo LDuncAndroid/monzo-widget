@@ -6,8 +6,9 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 
-class MonzoRepository(
+class MonzoRepository @Inject constructor(
     private val monzoApi: MonzoApi,
     private val monzoStorage: MonzoStorage
 ) {

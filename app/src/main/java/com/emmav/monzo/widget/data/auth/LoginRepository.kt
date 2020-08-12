@@ -5,8 +5,9 @@ import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import java.util.*
+import javax.inject.Inject
 
-class LoginRepository(
+class LoginRepository @Inject constructor(
     private val monzoApi: MonzoApi,
     private val loginStorage: LoginStorage,
     private val clientStorage: ClientStorage

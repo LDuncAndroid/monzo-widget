@@ -1,6 +1,8 @@
 package com.emmav.monzo.widget.data.auth
 
-class ClientRepository(private val clientStorage: ClientStorage) {
+import javax.inject.Inject
+
+class ClientRepository @Inject constructor(private val clientStorage: ClientStorage) {
 
     val clientConfigured: Boolean
         get() = clientId != null && clientSecret != null

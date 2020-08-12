@@ -3,6 +3,7 @@ package com.emmav.monzo.widget.feature.setupclient
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
@@ -15,19 +16,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.dp
-import com.emmav.monzo.widget.App
 import com.emmav.monzo.widget.R
 import com.emmav.monzo.widget.common.AppTheme
 import com.emmav.monzo.widget.common.FullWidthButton
 import com.emmav.monzo.widget.common.Info
 import com.emmav.monzo.widget.common.openUrl
 import com.emmav.monzo.widget.feature.login.LoginActivity
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SetupClientActivity : AppCompatActivity() {
-
-    private val viewModel by lazy {
-        App.get(this).setupClientModule.provideSetupClientViewModel()
-    }
+    private val viewModel: SetupClientViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

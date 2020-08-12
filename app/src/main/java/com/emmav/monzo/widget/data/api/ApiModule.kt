@@ -7,25 +7,34 @@ import com.emmav.monzo.widget.data.auth.LoginStorage
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.*
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import timber.log.Timber
 import java.io.IOException
 
-class ApiModule(
-    context: Context,
-    clientStorage: ClientStorage,
-    loginStorage: LoginStorage
-) {
-    private val baseHttpClient by lazy {
-        OkHttpClient.Builder()
-            .addInterceptor(ChuckerInterceptor(context))
-            .build()
-    }
+@Module
+@InstallIn(ApplicationComponent::class)
+object ApiModule {
 
-    val monzoApi by lazy {
-        baseHttpClient.newBuilder()
+    @Provides
+    fun provideMonzoApi(
+        @ApplicationContext context: Context,
+        loginStorage: LoginStorage,
+        clientStorage: ClientStorage
+    ): MonzoApi {
+        val baseHttpClient by lazy {
+            OkHttpClient.Builder()
+                .addInterceptor(ChuckerInterceptor(context))
+                .build()
+        }
+
+        return baseHttpClient.newBuilder()
             .addInterceptor { chain ->
                 val requestBuilder = chain.request().newBuilder()
                     .header("Accept", "application/json")
@@ -41,6 +50,17 @@ class ApiModule(
             .authenticator(MonzoAuthenticator(baseHttpClient, clientStorage, loginStorage))
             .build()
             .createMonzoApi()
+    }
+
+    private fun OkHttpClient.createMonzoApi(): MonzoApi {
+        val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+        return Retrofit.Builder()
+            .baseUrl("https://api.monzo.com")
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .client(this)
+            .build()
+            .create(MonzoApi::class.java)
     }
 
     class MonzoAuthenticator(
@@ -73,20 +93,6 @@ class ApiModule(
                 }
                 null
             }
-        }
-    }
-
-    companion object {
-
-        private fun OkHttpClient.createMonzoApi(): MonzoApi {
-            val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-            return Retrofit.Builder()
-                .baseUrl("https://api.monzo.com")
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(MoshiConverterFactory.create(moshi))
-                .client(this)
-                .build()
-                .create(MonzoApi::class.java)
         }
     }
 }
