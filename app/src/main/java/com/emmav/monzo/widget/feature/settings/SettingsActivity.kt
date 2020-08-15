@@ -7,6 +7,8 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.Box
+import androidx.compose.foundation.ContentGravity
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumnFor
@@ -102,7 +104,9 @@ private fun Content(
 ) {
     when {
         state.loading -> {
-            CircularProgressIndicator(modifier = Modifier.fillMaxSize())
+            Box(modifier = Modifier.fillMaxSize(), gravity = ContentGravity.Center) {
+                CircularProgressIndicator()
+            }
         }
         else -> {
             WidgetTypes(state.rows)

@@ -17,7 +17,6 @@ import androidx.core.content.ContextCompat
 import com.emmav.monzo.widget.R
 import com.emmav.monzo.widget.common.TypefaceSpan
 import com.emmav.monzo.widget.common.toPx
-import com.emmav.monzo.widget.data.api.toShortAccountType
 import com.emmav.monzo.widget.data.appwidget.Widget
 import com.emmav.monzo.widget.data.appwidget.WidgetRepository
 import com.emmav.monzo.widget.feature.settings.SettingsActivity
@@ -85,40 +84,20 @@ class WidgetProvider : AppWidgetProvider() {
                 val balance = numberFormat.format(BigDecimal(it.balance).scaleByPowerOfTen(-2).toBigInteger())
                 val spannableString = createSpannableForBalance(context, currency.symbol, balance, textColour)
 
-                when (it) {
-                    is Widget.Account -> {
-                        intent.putExtra(EXTRA_WIDGET_TYPE_ID, it.widgetTypeId)
-                        updateWidget(
-                            context = context,
-                            pendingIntent = PendingIntent.getActivity(
-                                context,
-                                widgetId,
-                                intent,
-                                PendingIntent.FLAG_UPDATE_CURRENT
-                            ),
-                            amount = spannableString,
-                            subtitle = "💳 ${it.name.toShortAccountType()}",
-                            appWidgetManager = appWidgetManager,
-                            appWidgetId = widgetId
-                        )
-                    }
-                    is Widget.Pot -> {
-                        intent.putExtra(EXTRA_WIDGET_TYPE_ID, it.widgetTypeId)
-                        updateWidget(
-                            context = context,
-                            pendingIntent = PendingIntent.getActivity(
-                                context,
-                                widgetId,
-                                intent,
-                                PendingIntent.FLAG_UPDATE_CURRENT
-                            ),
-                            amount = spannableString,
-                            subtitle = "🍯 ${it.name}",
-                            appWidgetManager = appWidgetManager,
-                            appWidgetId = widgetId
-                        )
-                    }
-                }
+                intent.putExtra(EXTRA_WIDGET_TYPE_ID, it.widgetTypeId)
+                updateWidget(
+                    context = context,
+                    pendingIntent = PendingIntent.getActivity(
+                        context,
+                        widgetId,
+                        intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                    ),
+                    amount = spannableString,
+                    subtitle = it.toString(),
+                    appWidgetManager = appWidgetManager,
+                    appWidgetId = widgetId
+                )
             }
         }
 

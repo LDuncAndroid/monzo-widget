@@ -5,6 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.Box
+import androidx.compose.foundation.ContentGravity
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -76,7 +78,9 @@ private fun Content(
 ) {
     when {
         state.loading -> {
-            CircularProgressIndicator(modifier = Modifier.fillMaxSize())
+            Box(modifier = Modifier.fillMaxSize(), gravity = ContentGravity.Center) {
+                CircularProgressIndicator()
+            }
         }
         state.widgets.isEmpty() -> {
             EmptyState(
@@ -94,12 +98,12 @@ private fun Content(
 @Composable
 private fun WidgetList(widgets: List<WidgetRow>) {
     LazyColumnFor(items = widgets, modifier = Modifier.fillMaxHeight()) { widget ->
-        Row(
-            modifier = Modifier.fillParentMaxWidth().clickable(onClick = { widget.click(Unit) })
-        ) {
+        Row(modifier = Modifier.fillParentMaxWidth()) {
             Card(
                 shape = RoundedCornerShape(4.dp),
-                modifier = Modifier.fillParentMaxWidth().padding(start = 16.dp, end = 16.dp, top = 16.dp)
+                modifier = Modifier.fillParentMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, top = 16.dp)
+                    .clickable(onClick = { widget.click(Unit) })
             ) {
                 Column {
                     Text(

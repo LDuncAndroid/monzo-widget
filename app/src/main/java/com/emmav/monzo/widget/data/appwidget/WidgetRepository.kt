@@ -1,5 +1,6 @@
 package com.emmav.monzo.widget.data.appwidget
 
+import com.emmav.monzo.widget.data.api.toLongAccountType
 import com.emmav.monzo.widget.data.db.DbWidgetWithRelations
 import com.emmav.monzo.widget.data.db.MonzoStorage
 import io.reactivex.Completable
@@ -43,7 +44,7 @@ private fun DbWidgetWithRelations.toWidget(): Widget {
         Widget.Account(
             appWidgetId = widget.id,
             widgetTypeId = account.id,
-            name = account.type,
+            name = account.type.toLongAccountType(),
             balance = balance.balance,
             currency = balance.currency
         )

@@ -5,7 +5,6 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.emmav.monzo.widget.common.BaseViewModel
 import com.emmav.monzo.widget.common.NumberFormat.formatBalance
-import com.emmav.monzo.widget.data.api.toLongAccountType
 import com.emmav.monzo.widget.data.appwidget.Widget
 import com.emmav.monzo.widget.data.appwidget.WidgetRepository
 import com.emmav.monzo.widget.feature.sync.SyncWorker
@@ -36,13 +35,9 @@ class HomeViewModel @ViewModelInject constructor(
     )
 
     private fun Widget.toRow(): WidgetRow {
-        val name = when (this) {
-            is Widget.Account -> "💳 ${name.toLongAccountType()}"
-            is Widget.Pot -> "🍯 $name"
-        }
         val amount = formatBalance(currency = currency, amount = balance, showFractionalDigits = true)
 
-        return WidgetRow(title = name, amount = amount, click = { onWidgetClicked(appWidgetId, widgetTypeId) })
+        return WidgetRow(title = toString(), amount = amount, click = { onWidgetClicked(appWidgetId, widgetTypeId) })
     }
 }
 
