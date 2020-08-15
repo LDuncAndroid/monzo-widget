@@ -66,7 +66,7 @@ class SetupClientActivity : AppCompatActivity() {
 }
 
 @Composable
-fun Content(
+private fun Content(
     state: SetupClientViewModel.State,
     clientIdChanged: (String) -> Unit,
     clientSecretChanged: (String) -> Unit,
@@ -115,7 +115,7 @@ fun Content(
 }
 
 @Composable
-fun Input(
+private fun Input(
     modifier: Modifier,
     state: SetupClientViewModel.State,
     clientIdChanged: (String) -> Unit,
@@ -136,7 +136,7 @@ fun Input(
 }
 
 @Composable
-fun Actions(
+private fun Actions(
     modifier: Modifier,
     state: SetupClientViewModel.State,
     hasExistingClientClicked: () -> Unit,

@@ -10,7 +10,7 @@ val AppColors = lightColors(
     onPrimary = Color.White,
     secondary = Color(0xFF303F9F),
     onSecondary = Color.Gray,
-    surface = Color(0xFFFF5722),
+    surface = Color(0xFFFFFFFF),
     onSurface = Color.Gray
 )
 

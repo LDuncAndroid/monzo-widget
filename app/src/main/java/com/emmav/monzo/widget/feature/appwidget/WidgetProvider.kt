@@ -78,7 +78,7 @@ class WidgetProvider : AppWidgetProvider() {
             val it = widgetRepository.widgetById(id = widgetId).blockingGet()
             val textColour = ContextCompat.getColor(context, R.color.monzo_dark)
 
-            if (it is Widget.Balance) {
+            if (it is Widget) {
                 val currency = Currency.getInstance(it.currency)
                 numberFormat.currency = currency
 
@@ -86,7 +86,7 @@ class WidgetProvider : AppWidgetProvider() {
                 val spannableString = createSpannableForBalance(context, currency.symbol, balance, textColour)
 
                 when (it) {
-                    is Widget.Balance.Account -> {
+                    is Widget.Account -> {
                         intent.putExtra(EXTRA_WIDGET_TYPE_ID, it.accountId)
                         updateWidget(
                             context = context,
@@ -102,7 +102,7 @@ class WidgetProvider : AppWidgetProvider() {
                             appWidgetId = widgetId
                         )
                     }
-                    is Widget.Balance.Pot -> {
+                    is Widget.Pot -> {
                         intent.putExtra(EXTRA_WIDGET_TYPE_ID, it.potId)
                         updateWidget(
                             context = context,

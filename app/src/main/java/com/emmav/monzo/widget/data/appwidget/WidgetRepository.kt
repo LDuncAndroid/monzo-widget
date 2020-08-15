@@ -33,7 +33,7 @@ class WidgetRepository @Inject constructor(private val monzoStorage: MonzoStorag
 private fun DbWidgetWithRelations.toWidget(): Widget {
     val id = widget.id.toString()
     return if (pot != null) {
-        Widget.Balance.Pot(
+        Widget.Pot(
             id = id,
             potId = pot.id,
             name = pot.name,
@@ -41,7 +41,7 @@ private fun DbWidgetWithRelations.toWidget(): Widget {
             currency = pot.currency
         )
     } else if (account != null && balance != null) {
-        Widget.Balance.Account(
+        Widget.Account(
             id = id,
             type = account.type,
             accountId = account.id,

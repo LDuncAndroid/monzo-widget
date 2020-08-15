@@ -106,7 +106,7 @@ class LoginActivity : AppCompatActivity() {
 }
 
 @Composable
-fun Content(
+private fun Content(
     state: LoginViewModel.State,
     loginClicked: () -> Unit,
     openMonzoApp: () -> Unit,
@@ -137,7 +137,7 @@ fun Content(
 
 
 @Composable
-fun Actions(
+private fun Actions(
     modifier: Modifier,
     state: LoginViewModel.State,
     loginClicked: () -> Unit,

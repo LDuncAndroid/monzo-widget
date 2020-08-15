@@ -5,12 +5,16 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.emmav.monzo.widget.common.BaseViewModel
 import com.emmav.monzo.widget.common.Item
+import com.emmav.monzo.widget.common.NumberFormat.formatBalance
 import com.emmav.monzo.widget.data.api.toLongAccountType
 import com.emmav.monzo.widget.data.appwidget.Widget
 import com.emmav.monzo.widget.data.appwidget.WidgetRepository
 import com.emmav.monzo.widget.feature.sync.SyncWorker
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
+import java.math.BigDecimal
+import java.text.NumberFormat
+import java.util.*
 
 class HomeViewModel @ViewModelInject constructor(
     workManager: WorkManager,
@@ -30,13 +34,12 @@ class HomeViewModel @ViewModelInject constructor(
 
 private fun Widget.toRow(): WidgetRow {
     val type = when (this) {
-        is Widget.Balance.Account -> type.toLongAccountType()
-        is Widget.Balance.Pot -> name
+        is Widget.Account -> "💳 ${type.toLongAccountType()}"
+        is Widget.Pot -> "🍯 $name"
     }
+    val amount = formatBalance(currency = currency, amount = balance, showFractionalDigits = true)
 
-    return WidgetRow.Widget(id = id, title = type)
+    return WidgetRow(id = id, title = type, amount = amount)
 }
 
-sealed class WidgetRow : Item {
-    data class Widget(override val id: String, val title: String) : WidgetRow()
-}
+data class WidgetRow(override val id: String, val title: String, val amount: String) : Item

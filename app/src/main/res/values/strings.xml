@@ -37,11 +37,13 @@
     <string name="login_requires_sca_action">Open Monzo app</string>
     <string name="login_requires_sca_monzo_not_installed">Monzo app not installed!</string>
     <string name="login_logged_in_title">Successfully logged in</string>
-    <string name="login_logged_in_subtitle">You can now create widgets to see your 💳 Account or 🍯 Pot balances. Go to your phone\'s launcher to make your first widget.</string>
+    <string name="login_logged_in_subtitle">You can now create widgets to see your 💳 Account or 🍯 Pot balances. \n\nGo to your phone\'s launcher to add your first widget.</string>
     <string name="login_logged_in_action">Close</string>
 
     <!-- Home -->
-    <string name="home_activity_title">Current widgets</string>
+    <string name="home_activity_title">Widgets</string>
+    <string name="home_empty_title">No widgets yet</string>
+    <string name="home_empty_subtitle">@string/login_logged_in_subtitle</string>
 
     <!-- Settings -->
     <string name="settings_activity_title">Widget Settings</string>
