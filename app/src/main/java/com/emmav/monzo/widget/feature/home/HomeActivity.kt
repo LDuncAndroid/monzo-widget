@@ -5,9 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.Box
-import androidx.compose.foundation.ContentGravity
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,9 +26,10 @@ import androidx.compose.ui.unit.sp
 import androidx.ui.tooling.preview.Preview
 import com.emmav.monzo.widget.R
 import com.emmav.monzo.widget.common.AppTheme
-import com.emmav.monzo.widget.common.Info
+import com.emmav.monzo.widget.common.EmptyState
 import com.emmav.monzo.widget.common.text
 import com.emmav.monzo.widget.common.textRes
+import com.emmav.monzo.widget.feature.settings.SettingsActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -45,6 +45,16 @@ class HomeActivity : AppCompatActivity() {
                     TopAppBar(title = { Text(ContextAmbient.current.getString(R.string.home_activity_title)) })
 
                     val state by viewModel.state.observeAsState(HomeViewModel.State())
+                    if (state.clickedWidget != null) {
+                        startActivity(
+                            SettingsActivity.buildIntent(
+                                context = ContextAmbient.current,
+                                appWidgetId = state.clickedWidget!!.first,
+                                widgetTypeId = state.clickedWidget!!.second
+                            )
+                        )
+                        finish()
+                    }
                     Content(
                         state = state
                     )
@@ -69,7 +79,11 @@ private fun Content(
             CircularProgressIndicator(modifier = Modifier.fillMaxSize())
         }
         state.widgets.isEmpty() -> {
-            EmptyState()
+            EmptyState(
+                emoji = text("🔜"),
+                title = textRes(R.string.home_empty_title),
+                subtitle = textRes(R.string.home_empty_subtitle)
+            )
         }
         else -> {
             WidgetList(state.widgets)
@@ -78,24 +92,11 @@ private fun Content(
 }
 
 @Composable
-private fun EmptyState() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        gravity = ContentGravity.Center
-    ) {
-        Info(
-            modifier = Modifier.padding(16.dp),
-            emoji = text("🔜"),
-            title = textRes(R.string.home_empty_title),
-            subtitle = textRes(R.string.home_empty_subtitle)
-        )
-    }
-}
-
-@Composable
 private fun WidgetList(widgets: List<WidgetRow>) {
     LazyColumnFor(items = widgets, modifier = Modifier.fillMaxHeight()) { widget ->
-        Row(modifier = Modifier.fillParentMaxWidth()) {
+        Row(
+            modifier = Modifier.fillParentMaxWidth().clickable(onClick = { widget.click(Unit) })
+        ) {
             Card(
                 shape = RoundedCornerShape(4.dp),
                 modifier = Modifier.fillParentMaxWidth().padding(start = 16.dp, end = 16.dp, top = 16.dp)
@@ -120,5 +121,5 @@ private fun WidgetList(widgets: List<WidgetRow>) {
 @Preview
 @Composable
 private fun WidgetListPreview() {
-    WidgetList(widgets = listOf(WidgetRow(id = "1", title = "hi", amount = "£1.23")))
+    WidgetList(widgets = listOf(WidgetRow(title = "hi", amount = "£1.23", click = {})))
 }

@@ -46,7 +46,9 @@
     <string name="home_empty_subtitle">@string/login_logged_in_subtitle</string>
 
     <!-- Settings -->
-    <string name="settings_activity_title">Widget Settings</string>
+    <string name="settings_activity_title">Configure Widget</string>
     <string name="settings_title_current_account">Current account</string>
-    <string name="settings_title_choose_type">Choose your widget type:</string>
+    <string name="settings_header_accounts">Accounts</string>
+    <string name="settings_header_pots">Pots</string>
+    <string name="settings_title_widget_type">Widget types</string>
 </resources>

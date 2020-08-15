@@ -87,7 +87,7 @@ class WidgetProvider : AppWidgetProvider() {
 
                 when (it) {
                     is Widget.Account -> {
-                        intent.putExtra(EXTRA_WIDGET_TYPE_ID, it.accountId)
+                        intent.putExtra(EXTRA_WIDGET_TYPE_ID, it.widgetTypeId)
                         updateWidget(
                             context = context,
                             pendingIntent = PendingIntent.getActivity(
@@ -97,13 +97,13 @@ class WidgetProvider : AppWidgetProvider() {
                                 PendingIntent.FLAG_UPDATE_CURRENT
                             ),
                             amount = spannableString,
-                            subtitle = "💳 ${it.type.toShortAccountType()}",
+                            subtitle = "💳 ${it.name.toShortAccountType()}",
                             appWidgetManager = appWidgetManager,
                             appWidgetId = widgetId
                         )
                     }
                     is Widget.Pot -> {
-                        intent.putExtra(EXTRA_WIDGET_TYPE_ID, it.potId)
+                        intent.putExtra(EXTRA_WIDGET_TYPE_ID, it.widgetTypeId)
                         updateWidget(
                             context = context,
                             pendingIntent = PendingIntent.getActivity(

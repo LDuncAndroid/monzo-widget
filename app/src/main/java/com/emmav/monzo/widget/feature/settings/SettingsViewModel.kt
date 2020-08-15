@@ -2,8 +2,10 @@ package com.emmav.monzo.widget.feature.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.emmav.monzo.widget.R
 import com.emmav.monzo.widget.common.BaseViewModel
-import com.emmav.monzo.widget.common.Item
+import com.emmav.monzo.widget.common.Text
+import com.emmav.monzo.widget.common.textRes
 import com.emmav.monzo.widget.data.api.toLongAccountType
 import com.emmav.monzo.widget.data.auth.LoginRepository
 import com.emmav.monzo.widget.data.db.MonzoRepository
@@ -25,28 +27,26 @@ class SettingsViewModel @AssistedInject constructor(
         .map {
             it.map { dbAccountWithBalance ->
                 val id = dbAccountWithBalance.account.id
-                Row.Account(
-                    id = id,
-                    type = dbAccountWithBalance.account.type.toLongAccountType(),
+                Row.Widget(
+                    title = "💳 ${dbAccountWithBalance.account.type.toLongAccountType()}",
                     isSelected = id == widgetTypeId,
                     click = { onAccountClicked(id) })
             }
         }
-        .map { listOf(Row.Header(id = "1", title = "Accounts")) + it }
+        .map { listOf(Row.Header(title = textRes(R.string.settings_header_accounts))) + it }
         .replay(1)
         .refCount()
 
     private val potsObservable: Observable<List<Row>> = monzoRepository.pots()
         .map {
             it.map { pot ->
-                Row.Pot(
-                    id = pot.id,
-                    name = pot.name,
+                Row.Widget(
+                    title = "🍯 ${pot.name}",
                     isSelected = pot.id == widgetTypeId,
                     click = { onPotClicked(pot.id) })
             }
         }
-        .map { listOf(Row.Header(id = "2", title = "Pots")) + it }
+        .map { listOf(Row.Header(title = textRes(R.string.settings_header_pots))) + it }
         .replay(1)
         .refCount()
 
@@ -103,18 +103,10 @@ class SettingsViewModel @AssistedInject constructor(
     }
 }
 
-sealed class Row : Item {
-    data class Header(override val id: String, val title: String) : Row()
-    data class Account(
-        override val id: String,
-        val type: String,
-        val isSelected: Boolean,
-        val click: ((Unit) -> Unit)
-    ) : Row()
-
-    data class Pot(
-        override val id: String,
-        val name: String,
+sealed class Row {
+    data class Header(val title: Text) : Row()
+    data class Widget(
+        val title: String,
         val isSelected: Boolean,
         val click: ((Unit) -> Unit)
     ) : Row()

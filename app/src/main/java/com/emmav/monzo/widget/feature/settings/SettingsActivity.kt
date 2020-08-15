@@ -1,35 +1,44 @@
 package com.emmav.monzo.widget.feature.settings
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.appwidget.AppWidgetManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.RadioButton
+import androidx.compose.material.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.emmav.monzo.widget.R
-import com.emmav.monzo.widget.common.SimpleAdapter
-import com.emmav.monzo.widget.common.gone
-import com.emmav.monzo.widget.common.visible
+import com.emmav.monzo.widget.common.AppTheme
+import com.emmav.monzo.widget.common.resolveText
 import com.emmav.monzo.widget.data.appwidget.WidgetRepository
 import com.emmav.monzo.widget.feature.appwidget.EXTRA_WIDGET_TYPE_ID
 import com.emmav.monzo.widget.feature.appwidget.WidgetProvider
 import com.emmav.monzo.widget.feature.splash.SplashActivity
-import com.squareup.inject.assisted.dagger2.AssistedModule
-import dagger.Module
-import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.components.ActivityComponent
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsActivity : AppCompatActivity() {
-    @Inject lateinit var widgetRepository: WidgetRepository
-
     private val appWidgetId by lazy {
         intent.extras!!.getInt(
             AppWidgetManager.EXTRA_APPWIDGET_ID,
@@ -42,33 +51,32 @@ class SettingsActivity : AppCompatActivity() {
     private val viewModel: SettingsViewModel by viewModels {
         SettingsViewModel.provideFactory(vmFactory, appWidgetId, widgetTypeId)
     }
-    private val settingsRecyclerView by lazy { findViewById<RecyclerView>(R.id.settingsRecyclerView) }
-    private val rowsAdapter by lazy { RowsAdapter() }
+    @Inject lateinit var widgetRepository: WidgetRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_settings)
         setResult(RESULT_CANCELED)
+        setContent {
+            AppTheme {
+                Column {
+                    TopAppBar(title = { Text(ContextAmbient.current.getString(R.string.settings_activity_title)) })
 
-        settingsRecyclerView.apply {
-            setHasFixedSize(true)
-            layoutManager = LinearLayoutManager(context)
-            adapter = rowsAdapter
+                    val state by viewModel.state.observeAsState(SettingsViewModel.State())
+                    if (state.error) {
+                        startActivity(SplashActivity.buildIntent(ContextAmbient.current))
+                        finish()
+                    }
+                    if (state.complete) {
+                        finishWidgetSetup()
+                    }
+
+                    Content(
+                        state = state
+                    )
+                }
+            }
         }
-
-        viewModel.state.observe(this, Observer { state ->
-            rowsAdapter.submitList(state.rows)
-
-            if (state.error) {
-                startActivity(SplashActivity.buildIntent(this))
-                finish()
-            }
-
-            if (state.complete) {
-                finishWidgetSetup()
-            }
-        })
     }
 
     private fun finishWidgetSetup() {
@@ -78,52 +86,67 @@ class SettingsActivity : AppCompatActivity() {
         WidgetProvider.updateWidget(this, appWidgetId, AppWidgetManager.getInstance(this), widgetRepository)
     }
 
-    @SuppressLint("SetTextI18n")
-    class RowsAdapter : SimpleAdapter<Row>() {
-        override fun getLayoutRes(item: Row): Int {
-            return when (item) {
-                is Row.Header -> R.layout.item_widget_settings_header
-                is Row.Account -> R.layout.item_widget_settings_row
-                is Row.Pot -> R.layout.item_widget_settings_row
-            }
-        }
+    companion object {
 
-        override fun onBind(holder: ViewHolder, item: Row) {
-            when (item) {
-                is Row.Header -> item.bind(holder)
-                is Row.Account -> item.bind(holder)
-                is Row.Pot -> item.bind(holder)
-            }
-        }
-
-        private fun Row.Header.bind(holder: ViewHolder) {
-            holder.containerView.findViewById<TextView>(R.id.widgetSettingsHeaderRowTextView).text = title
-        }
-
-        private fun Row.Account.bind(holder: ViewHolder) {
-            holder.containerView.findViewById<TextView>(R.id.widgetSettingsRowTextView).text = "💳 $type"
-            holder.containerView.setOnClickListener { click.invoke(Unit) }
-            showOrHideSelected(isSelected, holder)
-        }
-
-        private fun Row.Pot.bind(holder: ViewHolder) {
-            holder.containerView.findViewById<TextView>(R.id.widgetSettingsRowTextView).text = "🍯 $name"
-            holder.containerView.setOnClickListener { click.invoke(Unit) }
-            showOrHideSelected(isSelected, holder)
-        }
-
-        private fun showOrHideSelected(isSelected: Boolean, holder: ViewHolder) {
-            if (isSelected) {
-                holder.containerView.findViewById<TextView>(R.id.widgetSettingsRowTextView).visible()
-            } else {
-                holder.containerView.findViewById<TextView>(R.id.widgetSettingsRowTextView).gone()
-            }
+        fun buildIntent(context: Context, appWidgetId: Int, widgetTypeId: String): Intent {
+            return Intent(context, SettingsActivity::class.java)
+                .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                .putExtra(EXTRA_WIDGET_TYPE_ID, widgetTypeId)
         }
     }
 }
 
-@InstallIn(ActivityComponent::class)
-@AssistedModule
-@Module(includes = [AssistedInject_AssistedInjectModule::class])
-// Needed until AssistedInject is incorporated into Dagger
-interface AssistedInjectModule {}
+@Composable
+private fun Content(
+    state: SettingsViewModel.State,
+) {
+    when {
+        state.loading -> {
+            CircularProgressIndicator(modifier = Modifier.fillMaxSize())
+        }
+        else -> {
+            WidgetTypes(state.rows)
+        }
+    }
+}
+
+@Composable
+private fun WidgetTypes(rows: List<Row>) {
+    Card(
+        shape = RoundedCornerShape(4.dp),
+        modifier = Modifier.fillMaxWidth().padding(all = 16.dp)
+    ) {
+        Column {
+            Text(
+                text = ContextAmbient.current.getString(R.string.settings_title_widget_type),
+                style = TextStyle(fontSize = 22.sp, color = Color.Black),
+                modifier = Modifier.padding(all = 16.dp)
+            )
+            LazyColumnFor(items = rows, modifier = Modifier.fillMaxWidth()) { row ->
+                Row(modifier = Modifier.fillParentMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
+                    when (row) {
+                        is Row.Header -> {
+                            Text(
+                                text = ContextAmbient.current.resolveText(text = row.title),
+                                style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.W500),
+                            )
+                        }
+                        is Row.Widget -> {
+                            Row(
+                                modifier = Modifier.fillParentMaxWidth().padding(horizontal = 16.dp),
+                                verticalGravity = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = row.title,
+                                    style = TextStyle(fontSize = 20.sp),
+                                )
+                                RadioButton(selected = row.isSelected, onClick = { row.click(Unit) })
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,11 +1,13 @@
 package com.emmav.monzo.widget.common
 
+import androidx.compose.foundation.Box
+import androidx.compose.foundation.ContentGravity
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +41,25 @@ fun Info(
             textAlign = TextAlign.Center,
             color = AppColors.onSecondary,
             modifier = Modifier.padding(top = 16.dp)
+        )
+    }
+}
+
+@Composable
+fun EmptyState(
+    emoji: Text,
+    title: Text,
+    subtitle: Text
+) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        gravity = ContentGravity.Center
+    ) {
+        Info(
+            modifier = Modifier.padding(16.dp),
+            emoji = emoji,
+            title = title,
+            subtitle = subtitle
         )
     }
 }
