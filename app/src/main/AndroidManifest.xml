@@ -67,7 +67,8 @@
         <provider
             android:name="androidx.work.impl.WorkManagerInitializer"
             android:authorities="${applicationId}.workmanager-init"
-            tools:node="remove" />
+            tools:node="remove"
+            tools:ignore="ExportedContentProvider" />
     </application>
 
 </manifest>

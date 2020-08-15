@@ -21,6 +21,7 @@ import java.io.IOException
 @Module
 @InstallIn(ApplicationComponent::class)
 object ApiModule {
+    private const val useFake = true
 
     @Provides
     fun provideMonzoApi(
@@ -28,6 +29,10 @@ object ApiModule {
         loginStorage: LoginStorage,
         clientStorage: ClientStorage
     ): MonzoApi {
+        if (useFake) {
+            return FakeMonzoApi()
+        }
+
         val baseHttpClient by lazy {
             OkHttpClient.Builder()
                 .addInterceptor(ChuckerInterceptor(context))

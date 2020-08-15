@@ -13,15 +13,13 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
-import javax.inject.Inject
 
 class SyncWorker @WorkerInject constructor(
     @Assisted private val context: Context,
     @Assisted workerParams: WorkerParameters,
+    private val monzoRepository: MonzoRepository,
+    private val widgetRepository: WidgetRepository,
 ) : RxWorker(context, workerParams) {
-
-    @Inject lateinit var monzoRepository: MonzoRepository
-    @Inject lateinit var widgetRepository: WidgetRepository
 
     override fun createWork(): Single<Result> {
         return monzoRepository.syncAccounts()

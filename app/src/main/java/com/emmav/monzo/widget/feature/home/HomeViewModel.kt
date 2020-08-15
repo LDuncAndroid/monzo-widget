@@ -1,19 +1,25 @@
 package com.emmav.monzo.widget.feature.home
 
 import androidx.hilt.lifecycle.ViewModelInject
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import com.emmav.monzo.widget.common.BaseViewModel
 import com.emmav.monzo.widget.common.Item
 import com.emmav.monzo.widget.data.api.toLongAccountType
 import com.emmav.monzo.widget.data.appwidget.Widget
 import com.emmav.monzo.widget.data.appwidget.WidgetRepository
+import com.emmav.monzo.widget.feature.sync.SyncWorker
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 
 class HomeViewModel @ViewModelInject constructor(
+    workManager: WorkManager,
     widgetRepository: WidgetRepository
 ) : BaseViewModel<HomeViewModel.State>(initialState = State()) {
 
     init {
+        workManager.enqueue(OneTimeWorkRequest.Builder(SyncWorker::class.java).build())
+
         disposables += widgetRepository.allWidgets()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { setState { copy(loading = false, widgets = it.map { it.toRow() }) } }
