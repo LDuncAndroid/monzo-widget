@@ -6,11 +6,13 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.Box
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ConstraintLayout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -113,7 +115,7 @@ private fun Content(
     loggedIn: () -> Unit,
 ) {
     ConstraintLayout(modifier = Modifier.fillMaxSize().padding(all = 16.dp)) {
-        val (info, actions) = createRefs()
+        val (info, loading, actions) = createRefs()
         Info(
             modifier = Modifier.constrainAs(info) {
                 centerHorizontallyTo(parent)
@@ -123,6 +125,14 @@ private fun Content(
             title = state.title,
             subtitle = state.subtitle
         )
+        if (state.showLoading) {
+            Box(modifier = Modifier.constrainAs(loading) {
+                centerHorizontallyTo(parent)
+                linkTo(top = parent.top, bottom = info.top)
+            }) {
+                CircularProgressIndicator()
+            }
+        }
         Actions(
             modifier = Modifier.constrainAs(actions) {
                 bottom.linkTo(parent.bottom)
