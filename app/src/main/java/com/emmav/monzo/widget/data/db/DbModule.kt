@@ -9,12 +9,13 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Singleton
 
 @Module
 @InstallIn(ApplicationComponent::class)
 object DbModule {
 
-    @Provides
+    @Provides @Singleton
     fun provideDatabase(@ApplicationContext context: Context): MonzoStorage {
         return Room.databaseBuilder(context, AppDatabase::class.java, "db")
             .fallbackToDestructiveMigration()

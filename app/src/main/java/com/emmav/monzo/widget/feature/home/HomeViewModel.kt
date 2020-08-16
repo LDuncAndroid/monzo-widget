@@ -21,7 +21,7 @@ class HomeViewModel @ViewModelInject constructor(
 
         disposables += widgetRepository.allWidgets()
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { setState { copy(loading = false, widgets = it.map { it.toRow() }) } }
+            .subscribe { setState { copy(loading = false, widgets = it.map { it.toRow() }, clickedWidget = null) } }
     }
 
     private fun onWidgetClicked(appWidgetId: Int, widgetTypeId: String) {
