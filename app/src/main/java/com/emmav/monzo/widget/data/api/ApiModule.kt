@@ -2,6 +2,7 @@ package com.emmav.monzo.widget.data.api
 
 import android.content.Context
 import com.chuckerteam.chucker.api.ChuckerInterceptor
+import com.emmav.monzo.widget.BuildConfig
 import com.emmav.monzo.widget.data.auth.ClientStorage
 import com.emmav.monzo.widget.data.auth.LoginStorage
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -21,7 +22,7 @@ import java.io.IOException
 @Module
 @InstallIn(ApplicationComponent::class)
 object ApiModule {
-    private const val useFake = true
+    private val useFake = BuildConfig.DEBUG
 
     @Provides
     fun provideMonzoApi(
