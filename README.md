@@ -2,9 +2,9 @@
 
 An Android app widget for your homescreen, showing the balance of your accounts or Pots.
 
-| Launcher | Home | Settings |
-|---|---|---|
-| ![launcher](images/preview.png) | ![home](images/home.png) | ![settings](images/settings.png) |
+| Launcher | Home (empty state) | Home | Settings |
+|---|---|---|---|
+| ![launcher](images/preview.png) | ![empty](images/empty.png) | ![home](images/home.png) | ![settings](images/settings.png) |
 
 ## Configure Monzo client
 
