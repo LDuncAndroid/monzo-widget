@@ -26,7 +26,7 @@
     <!-- Login -->
     <string name="login_activity_title">Monzo Widget</string>
     <string name="login_unauthed_title">Login with Monzo</string>
-    <string name="login_unauthed_subtitle">Tap \'Login\' below to get started and we\'ll walk you through how to log in with your Monzo account.</string>
+    <string name="login_unauthed_subtitle">Tap \'Login\' below to get started, and we\'ll walk you through how to log in with your Monzo account.</string>
     <string name="login_unauthed_action">Login</string>
     <string name="login_redirecting_title">Redirecting to browser in… %1$d</string>
     <string name="login_redirecting_subtitle">Please follow the instructions to send a magic link email, then open the email and click on \'Log in to Monzo\'.</string>

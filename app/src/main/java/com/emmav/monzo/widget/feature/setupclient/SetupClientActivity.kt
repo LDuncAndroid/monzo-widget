@@ -7,6 +7,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.TextField
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
@@ -33,16 +35,19 @@ class SetupClientActivity : AppCompatActivity() {
 
         setContent {
             AppTheme {
-                Column {
+                Scaffold(topBar = {
                     TopAppBar(title = { Text(ContextAmbient.current.getString(R.string.setup_activity_title)) })
-
+                }, bodyContent = {
                     val state by viewModel.state.observeAsState(SetupClientViewModel.State())
                     if (state.finished) {
                         startActivity(LoginActivity.buildIntent(ContextAmbient.current))
                         finish()
                     }
                     if (state.openCreateClientInBrowser) {
-                        ContextAmbient.current.openUrl("https://developers.monzo.com")
+                        openUrl(
+                            url = "https://developers.monzo.com",
+                            toolbarColor = MaterialTheme.colors.primary
+                        )
                     }
                     Content(
                         state = state,
@@ -53,7 +58,7 @@ class SetupClientActivity : AppCompatActivity() {
                         createClientClicked = { viewModel.onCreateClientClicked() },
                         submitClicked = { viewModel.onSubmitClicked() }
                     )
-                }
+                })
             }
         }
     }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,13 +34,14 @@ fun Info(
         Text(
             text = ContextAmbient.current.resolveText(title),
             fontSize = 22.sp,
+            color = MaterialTheme.colors.onSecondary,
             modifier = Modifier.padding(top = 32.dp)
         )
         Text(
             text = ContextAmbient.current.resolveText(subtitle),
             fontSize = 16.sp,
             textAlign = TextAlign.Center,
-            color = AppColors.onSecondary,
+            color = MaterialTheme.colors.onSecondary.copy(alpha = 0.8f),
             modifier = Modifier.padding(top = 16.dp)
         )
     }
@@ -85,6 +87,7 @@ fun FullWidthButton(
     ) {
         Text(
             text = ContextAmbient.current.getString(title).toUpperCase(Locale.getDefault()),
+            color = MaterialTheme.colors.onPrimary,
         )
     }
 }

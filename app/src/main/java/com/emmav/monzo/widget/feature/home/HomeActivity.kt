@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Scaffold
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,9 +44,9 @@ class HomeActivity : AppCompatActivity() {
 
         setContent {
             AppTheme {
-                Column {
+                Scaffold(topBar = {
                     TopAppBar(title = { Text(ContextAmbient.current.getString(R.string.home_activity_title)) })
-
+                }, bodyContent = {
                     val state by viewModel.state.observeAsState(HomeViewModel.State())
                     if (state.clickedWidget != null) {
                         startActivity(
@@ -55,12 +56,11 @@ class HomeActivity : AppCompatActivity() {
                                 widgetTypeId = state.clickedWidget!!.second
                             )
                         )
-                        finish()
                     }
                     Content(
                         state = state
                     )
-                }
+                })
             }
         }
     }

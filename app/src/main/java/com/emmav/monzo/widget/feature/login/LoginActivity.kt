@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.ConstraintLayout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -44,14 +46,14 @@ class LoginActivity : AppCompatActivity() {
 
         setContent {
             AppTheme {
-                Column {
+                Scaffold(topBar = {
                     TopAppBar(title = { Text(ContextAmbient.current.getString(R.string.login_activity_title)) })
-
+                }, bodyContent = {
                     val state by viewModel.state.observeAsState(LoginViewModel.State.Unknown())
                     when (state) {
                         is LoginViewModel.State.RequestMagicLink -> {
                             (state as LoginViewModel.State.RequestMagicLink).url?.let {
-                                openUrl(it)
+                                openUrl(url = it, toolbarColor = MaterialTheme.colors.primary)
                                 finish()
                             }
                         }
@@ -82,7 +84,7 @@ class LoginActivity : AppCompatActivity() {
                         openMonzoApp = { viewModel.onOpenMonzoAppClicked() },
                         loggedIn = { viewModel.onLoggedInClicked() }
                     )
-                }
+                })
             }
         }
     }

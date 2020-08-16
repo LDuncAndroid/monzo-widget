@@ -13,16 +13,12 @@ import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.RadioButton
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.text.TextStyle
@@ -61,9 +57,9 @@ class SettingsActivity : AppCompatActivity() {
         setResult(RESULT_CANCELED)
         setContent {
             AppTheme {
-                Column {
+                Scaffold(topBar = {
                     TopAppBar(title = { Text(ContextAmbient.current.getString(R.string.settings_activity_title)) })
-
+                }, bodyContent = {
                     val state by viewModel.state.observeAsState(SettingsViewModel.State())
                     if (state.error) {
                         startActivity(SplashActivity.buildIntent(ContextAmbient.current))
@@ -76,7 +72,7 @@ class SettingsActivity : AppCompatActivity() {
                     Content(
                         state = state
                     )
-                }
+                })
             }
         }
     }
@@ -123,7 +119,7 @@ private fun WidgetTypes(rows: List<Row>) {
         Column {
             Text(
                 text = ContextAmbient.current.getString(R.string.settings_title_widget_type),
-                style = TextStyle(fontSize = 22.sp, color = Color.Black),
+                style = TextStyle(fontSize = 22.sp),
                 modifier = Modifier.padding(all = 16.dp)
             )
             LazyColumnFor(items = rows, modifier = Modifier.fillMaxWidth()) { row ->
