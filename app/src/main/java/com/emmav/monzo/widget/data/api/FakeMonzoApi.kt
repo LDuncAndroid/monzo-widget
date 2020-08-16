@@ -34,7 +34,14 @@ class FakeMonzoApi : MonzoApi {
     }
 
     override fun accounts(): Single<AccountsResponse> {
-        return Single.just(AccountsResponse(accounts = listOf(ApiAccount(id = "id1", type = "uk_retail"))))
+        return Single.just(
+            AccountsResponse(
+                accounts = listOf(
+                    ApiAccount(id = "id1", type = "uk_retail"),
+                    ApiAccount(id = "id2", type = "uk_retail_joint")
+                )
+            )
+        )
     }
 
     override fun balance(accountId: String): Single<ApiBalance> {
@@ -49,6 +56,13 @@ class FakeMonzoApi : MonzoApi {
                         id = "pot1",
                         name = "Savings",
                         balance = 34_10,
+                        currency = "GBP",
+                        deleted = false
+                    ),
+                    ApiPot(
+                        id = "pot2",
+                        name = "Rainy Day",
+                        balance = 112_78,
                         currency = "GBP",
                         deleted = false
                     )
