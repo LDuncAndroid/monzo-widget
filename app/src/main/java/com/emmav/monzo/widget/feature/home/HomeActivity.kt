@@ -12,15 +12,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Scaffold
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.text.TextStyle
@@ -90,32 +86,83 @@ private fun Content(
             )
         }
         else -> {
-            WidgetList(state.widgets)
+            Column {
+                Settings()
+                WidgetList(state.widgets)
+            }
+        }
+    }
+}
+
+@Composable
+private fun Settings() {
+    Card(
+        shape = RoundedCornerShape(4.dp),
+        modifier = Modifier.fillMaxWidth().padding(all = 16.dp)
+    ) {
+        Column {
+            Text(
+                text = ContextAmbient.current.getString(R.string.home_title_settings),
+                style = TextStyle(fontSize = 22.sp),
+                modifier = Modifier.padding(all = 16.dp)
+            )
+            Row(modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+                ) {
+                    Text(
+                        text = ContextAmbient.current.getString(R.string.home_title_refresh_interval),
+                        style = TextStyle(fontSize = 20.sp),
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                    )
+                    Text(
+                        text = ContextAmbient.current.getString(R.string.home_subtitle_refresh_interval),
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colors.onSecondary.copy(alpha = 0.8f)
+                        ),
+                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)
+                    )
+                }
+            }
         }
     }
 }
 
 @Composable
 private fun WidgetList(widgets: List<WidgetRow>) {
-    LazyColumnFor(items = widgets, modifier = Modifier.fillMaxHeight()) { widget ->
-        Row(modifier = Modifier.fillParentMaxWidth()) {
-            Card(
-                shape = RoundedCornerShape(4.dp),
-                modifier = Modifier.fillParentMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, top = 16.dp)
+    Card(
+        shape = RoundedCornerShape(4.dp),
+        modifier = Modifier.fillMaxWidth().padding(all = 16.dp)
+    ) {
+        Column {
+            Text(
+                text = ContextAmbient.current.getString(R.string.home_title_existing_widgets),
+                style = TextStyle(fontSize = 22.sp),
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp)
+            )
+            LazyColumnFor(items = widgets, modifier = Modifier.fillMaxWidth()) { widget ->
+                Row(modifier = Modifier.fillParentMaxWidth()
                     .clickable(onClick = { widget.click(Unit) })
-            ) {
-                Column {
-                    Text(
-                        text = widget.title,
-                        style = TextStyle(fontSize = 22.sp),
-                        modifier = Modifier.padding(all = 16.dp),
-                    )
-                    Text(
-                        text = widget.amount,
-                        style = TextStyle(fontSize = 14.sp, color = Color.Gray),
-                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-                    )
+                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.fillParentMaxWidth().padding(start = 16.dp, end = 16.dp, top = 16.dp)
+                    ) {
+                        Text(
+                            text = widget.title,
+                            style = TextStyle(fontSize = 20.sp),
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                        )
+                        Text(
+                            text = widget.amount,
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colors.onSecondary.copy(alpha = 0.8f)
+                            ),
+                            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)
+                        )
+                    }
                 }
             }
         }
