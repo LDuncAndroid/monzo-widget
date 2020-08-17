@@ -21,28 +21,24 @@ class HomeViewModel @ViewModelInject constructor(
 
         disposables += widgetRepository.allWidgets()
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { setState { copy(loading = false, widgets = it.map { it.toRow() }, clickedWidget = null) } }
-    }
-
-    private fun onWidgetClicked(appWidgetId: Int, widgetTypeId: String) {
-        setState { copy(clickedWidget = Pair(appWidgetId, widgetTypeId)) }
+            .subscribe { setState { copy(loading = false, widgets = it.map { it.toRow() }) } }
     }
 
     data class State(
         val loading: Boolean = true,
         val widgets: List<WidgetRow> = emptyList(),
-        val clickedWidget: Pair<Int, String>? = null
     )
 
     private fun Widget.toRow(): WidgetRow {
         val amount = formatBalance(currency = currency, amount = balance, showFractionalDigits = true)
 
-        return WidgetRow(title = toString(), amount = amount, click = { onWidgetClicked(appWidgetId, widgetTypeId) })
+        return WidgetRow(title = toString(), amount = amount, appWidgetId = appWidgetId, widgetTypeId = widgetTypeId)
     }
 }
 
 data class WidgetRow(
     val title: String,
     val amount: String,
-    val click: ((Unit) -> Unit)
+    val appWidgetId: Int,
+    val widgetTypeId: String
 )

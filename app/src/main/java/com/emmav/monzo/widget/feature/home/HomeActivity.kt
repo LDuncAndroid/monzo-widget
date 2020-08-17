@@ -44,17 +44,17 @@ class HomeActivity : AppCompatActivity() {
                     TopAppBar(title = { Text(ContextAmbient.current.getString(R.string.home_activity_title)) })
                 }, bodyContent = {
                     val state by viewModel.state.observeAsState(HomeViewModel.State())
-                    if (state.clickedWidget != null) {
-                        startActivity(
-                            SettingsActivity.buildIntent(
-                                context = ContextAmbient.current,
-                                appWidgetId = state.clickedWidget!!.first,
-                                widgetTypeId = state.clickedWidget!!.second
-                            )
-                        )
-                    }
                     Content(
-                        state = state
+                        state = state,
+                        onWidgetClicked = {
+                            startActivity(
+                                SettingsActivity.buildIntent(
+                                    context = this,
+                                    appWidgetId = it.appWidgetId,
+                                    widgetTypeId = it.widgetTypeId
+                                )
+                            )
+                        }
                     )
                 })
             }
@@ -71,6 +71,7 @@ class HomeActivity : AppCompatActivity() {
 @Composable
 private fun Content(
     state: HomeViewModel.State,
+    onWidgetClicked: (WidgetRow) -> Unit
 ) {
     when {
         state.loading -> {
@@ -88,7 +89,7 @@ private fun Content(
         else -> {
             Column {
                 Settings()
-                WidgetList(state.widgets)
+                WidgetList(widgets = state.widgets, onWidgetClicked = onWidgetClicked)
             }
         }
     }
@@ -130,7 +131,10 @@ private fun Settings() {
 }
 
 @Composable
-private fun WidgetList(widgets: List<WidgetRow>) {
+private fun WidgetList(
+    widgets: List<WidgetRow>,
+    onWidgetClicked: (WidgetRow) -> Unit
+) {
     Card(
         shape = RoundedCornerShape(4.dp),
         modifier = Modifier.fillMaxWidth().padding(all = 16.dp)
@@ -142,9 +146,10 @@ private fun WidgetList(widgets: List<WidgetRow>) {
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp)
             )
             LazyColumnFor(items = widgets, modifier = Modifier.fillMaxWidth()) { widget ->
-                Row(modifier = Modifier.fillParentMaxWidth()
-                    .clickable(onClick = { widget.click(Unit) })
-                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                Row(
+                    modifier = Modifier.fillParentMaxWidth()
+                        .clickable(onClick = { onWidgetClicked.invoke(widget) })
+                        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
                 ) {
                     Column(
                         modifier = Modifier.fillParentMaxWidth().padding(start = 16.dp, end = 16.dp, top = 16.dp)
@@ -172,5 +177,8 @@ private fun WidgetList(widgets: List<WidgetRow>) {
 @Preview
 @Composable
 private fun WidgetListPreview() {
-    WidgetList(widgets = listOf(WidgetRow(title = "hi", amount = "£1.23", click = {})))
+    WidgetList(
+        widgets = listOf(WidgetRow(title = "hi", amount = "£1.23", appWidgetId = 1, widgetTypeId = "id1")),
+        onWidgetClicked = {}
+    )
 }
