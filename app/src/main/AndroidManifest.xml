@@ -28,7 +28,7 @@
         <activity
             android:name=".feature.setupclient.SetupClientActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustPan" />
+            android:windowSoftInputMode="adjustResize|stateVisible" />
         <activity
             android:name=".feature.login.LoginActivity"
             android:theme="@style/AppTheme.NoActionBar">

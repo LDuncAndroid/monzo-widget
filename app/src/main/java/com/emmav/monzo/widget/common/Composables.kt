@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,7 +22,7 @@ import java.util.*
 
 @Composable
 fun Info(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     emoji: Text,
     title: Text,
     subtitle: Text
@@ -33,15 +34,13 @@ fun Info(
         )
         Text(
             text = ContextAmbient.current.resolveText(title),
-            fontSize = 22.sp,
-            color = MaterialTheme.colors.onSecondary,
+            style = MaterialTheme.typography.h6,
             modifier = Modifier.padding(top = 32.dp)
         )
         Text(
             text = ContextAmbient.current.resolveText(subtitle),
-            fontSize = 16.sp,
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colors.onSecondary.copy(alpha = 0.8f),
+            style = MaterialTheme.typography.body2,
             modifier = Modifier.padding(top = 16.dp)
         )
     }
@@ -66,16 +65,29 @@ fun EmptyState(
     }
 }
 
-@Preview
+@Preview(name = "light theme", group = "info")
 @Composable
-fun InfoPreview() {
+fun InfoPreviewLight() {
     AppTheme {
-        Info(modifier = Modifier, emoji = text("🙌🏽"), title = text("title"), subtitle = text("subtitle"))
+        Surface {
+            Info(modifier = Modifier, emoji = text("🙌🏽"), title = text("title"), subtitle = text("subtitle"))
+        }
+    }
+}
+
+@Preview(name = "dark theme", group = "info")
+@Composable
+fun InfoPreviewDark() {
+    AppTheme(darkTheme = true) {
+        Surface {
+            Info(modifier = Modifier, emoji = text("🙌🏽"), title = text("title"), subtitle = text("subtitle"))
+        }
     }
 }
 
 @Composable
 fun FullWidthButton(
+    modifier: Modifier = Modifier.padding(bottom = 16.dp),
     onClick: () -> Unit,
     title: Int,
     enabled: Boolean = true
@@ -83,7 +95,7 @@ fun FullWidthButton(
     Button(
         onClick = onClick,
         enabled = enabled,
-        modifier = Modifier.padding(bottom = 16.dp).fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     ) {
         Text(
             text = ContextAmbient.current.getString(title).toUpperCase(Locale.getDefault()),

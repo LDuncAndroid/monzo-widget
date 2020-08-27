@@ -5,19 +5,22 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.TextField
-import androidx.compose.material.TopAppBar
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.ui.tooling.preview.Preview
 import com.emmav.monzo.widget.R
 import com.emmav.monzo.widget.common.AppTheme
 import com.emmav.monzo.widget.common.FullWidthButton
@@ -70,6 +73,24 @@ class SetupClientActivity : AppCompatActivity() {
     }
 }
 
+@Preview
+@Composable
+private fun EnterClientDetailsPreview() {
+    AppTheme {
+        Surface {
+            Content(
+                state = SetupClientViewModel.State(uiState = SetupClientViewModel.UiState.ENTER_CLIENT_DETAILS),
+                clientIdChanged = {},
+                clientSecretChanged = {},
+                hasExistingClientClicked = {},
+                goToCreateClientClicked = {},
+                createClientClicked = {},
+                submitClicked = {}
+            )
+        }
+    }
+}
+
 @Composable
 private fun Content(
     state: SetupClientViewModel.State,
@@ -80,36 +101,27 @@ private fun Content(
     createClientClicked: () -> Unit,
     submitClicked: () -> Unit
 ) {
-    ConstraintLayout(modifier = Modifier.fillMaxSize().padding(all = 16.dp)) {
-        val (info, input, actions) = createRefs()
-        val inputVisible = state.uiState == SetupClientViewModel.UiState.ENTER_CLIENT_DETAILS
-        Info(
-            modifier = Modifier.constrainAs(info) {
-                centerHorizontallyTo(parent)
-                if (inputVisible) {
-                    linkTo(top = parent.top, bottom = input.top)
-                } else {
-                    linkTo(top = parent.top, bottom = actions.top)
-                }
-            },
-            emoji = state.uiState.emoji,
-            title = state.uiState.title,
-            subtitle = state.uiState.subtitle
-        )
-        if (inputVisible) {
-            Input(
-                modifier = Modifier.constrainAs(input) {
-                    top.linkTo(info.bottom)
-                },
-                state = state,
-                clientIdChanged = clientIdChanged,
-                clientSecretChanged = clientSecretChanged
+    Stack(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
+        ScrollableColumn(modifier = Modifier.gravity(Alignment.TopCenter)) {
+            Spacer(modifier = Modifier.preferredHeight(height = 64.dp))
+            Info(
+                modifier = Modifier.gravity(Alignment.CenterHorizontally),
+                emoji = state.uiState.emoji,
+                title = state.uiState.title,
+                subtitle = state.uiState.subtitle
             )
+            if (state.uiState == SetupClientViewModel.UiState.ENTER_CLIENT_DETAILS) {
+                Input(
+                    modifier = Modifier,
+                    state = state,
+                    clientIdChanged = clientIdChanged,
+                    clientSecretChanged = clientSecretChanged
+                )
+            }
+            Spacer(modifier = Modifier.height(height = 128.dp))
         }
         Actions(
-            modifier = Modifier.constrainAs(actions) {
-                bottom.linkTo(parent.bottom)
-            },
+            modifier = Modifier.gravity(Alignment.BottomCenter).padding(bottom = 16.dp),
             state = state,
             hasExistingClientClicked = hasExistingClientClicked,
             goToCreateClientClicked = goToCreateClientClicked,
@@ -128,12 +140,14 @@ private fun Input(
 ) {
     Column(modifier = modifier.padding(top = 16.dp)) {
         TextField(value = state.clientId,
+            imeAction = ImeAction.Next,
             modifier = Modifier.fillMaxWidth(),
             onValueChange = { clientIdChanged(it) },
             label = { Text(ContextAmbient.current.getString(R.string.setup_enter_client_id_hint)) }
         )
         TextField(value = state.clientSecret,
             modifier = Modifier.fillMaxWidth(),
+            imeAction = ImeAction.Send,
             onValueChange = { clientSecretChanged(it) },
             label = { Text(ContextAmbient.current.getString(R.string.setup_enter_client_secret_hint)) }
         )
